@@ -14,8 +14,10 @@ def customer_form(request):
     else:
         form = CustomerForm()
 
-    return render(request, 'crm_api/customer.html', {'form': form})
+    return render(request, 'crm_api/client.html', {'form': form})
 
 
 def thanks(request):
     return render(request, 'crm_api/thanks.html')
+
+
