@@ -16,7 +16,7 @@ class Customer(models.Model):
         ('radny', 'Radny termin (1.4)'),
         ('odlozeny', 'Odlozeny termin (1.7)')
     ]
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, primary_key=True)
     address = models.CharField(max_length=100)
     ico = models.CharField(max_length=20, blank=True, null=True)
     dic = models.CharField(max_length=20, blank=True, null=True)

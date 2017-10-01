@@ -11,7 +11,7 @@ def customer_form(request):
         form = CustomerForm(request.POST)
         if form.is_valid():
             f = form.save()
-            return render(request, 'crm_api/thanks.html')
+            return HttpResponseRedirect('/crm')
 
     else:
         form = CustomerForm()
@@ -27,11 +27,12 @@ def index(request):
     return render(request, 'crm_api/index.html')
 
 
-def edit(request):
-    return render(request, 'crm_api/edit.html', {'customer_list': Customer.objects.all().values_list()})
-
-
-class EditListView(generic.ListView):
+class SelectCustomerListView(generic.ListView):
     model = Customer
-    template_name = 'crm_api/edit.html'
+    template_name = 'crm_api/select_customer.html'
     context_object_name = 'object_list'
+
+
+class CustomerUpdate(generic.UpdateView):
+    model = Customer
+    template_name = 'crm_api/customer_update.html'

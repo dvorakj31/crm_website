@@ -1,0 +1,10 @@
+<h1>Vyberte klienta k uprave</h1>
+<form method="post" action="">
+    {% csrf_token %}
+        <select id="customer_id" name="customer_id">
+            {% for cust in object_list %}
+                <option value="{{cust.id}}">{{cust.name}}</option>
+            {% endfor %}
+        </select>
+    <input type="submit" value="Vyber"/>
+</form>

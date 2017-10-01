@@ -17,5 +17,7 @@ class CustomerForm(forms.ModelForm):
             'soc_insurance': 'Socialni pojistovna',
             'vat': 'Platce DPH',
             'tax_office': 'Financni urad',
-            'phone': 'Telefon'
+            'phone': 'Telefon',
+            'tax_type': 'Typ dane',
+            'tax_term': 'Termin dane'
         }
