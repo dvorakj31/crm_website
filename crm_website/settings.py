@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Login settings
+LOGIN_REDIRECT_URL = '/crm'
+LOGIN_URL= "/crm/login/"
+
 
 # Application definition
 
