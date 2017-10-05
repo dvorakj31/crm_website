@@ -1,0 +1,6 @@
+<table summary="vypis klientu" class="table table-bordered sortable table-hover">
+    <tr><th>Nazev spolecnosti</th><th>adresa</th></tr>
+    {% for customer in customer_list %}
+        <tr><td>{{ customer.name }}</td><td>{{ customer.address }}</td></tr>
+    {% endfor %}
+</table>

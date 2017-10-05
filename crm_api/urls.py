@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^delete/(?P<pk>[0-9]+)/$', views.CustomerDelete.as_view(), name='delete_customer'),
     url(r'^login/$', auth_views.login, {'template_name': 'crm_api/login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'template_name': 'crm_api/logout.html', 'next_page': '/crm'}, name='logout'),
+    url(r'^client_list/$', views.CustomerList.as_view(), name='client_list'),
 ]

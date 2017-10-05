@@ -47,7 +47,7 @@ class SelectCustomerListView(LoginRequiredMixin, generic.ListView):
 
 class CustomerUpdate(LoginRequiredMixin, generic.UpdateView):
     model = Customer
-    template_name = 'crm_api/customer_update.html'
+    template_name = 'crm_api/client.html'
     fields = '__all__'
     success_url = '/crm/'
     login_url = '/crm/login/'
@@ -57,4 +57,11 @@ class CustomerDelete(LoginRequiredMixin, generic.DeleteView):
     model = Customer
     success_url = reverse_lazy('crm_api:index')
     fields = ['name']
+    login_url = '/crm/login/'
+
+
+class CustomerList(LoginRequiredMixin, generic.ListView):
+    model = Customer
+    template_name = 'crm_api/customer_list.html'
+    context_object_name = 'customer_list'
     login_url = '/crm/login/'
