@@ -1,0 +1,25 @@
+<header>
+    <div class="container clearfix">
+        <nav class = "navbar navbar-inverse navbar-fixed-top" id="navbar_whole">
+            <div id= "navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="{% url 'crm_api:index' %}">Home</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'crm_api:create_customer' %}">Vytvorit klienta</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'crm_api:select_customer' %}">Upravit klienta</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'crm_api:delete' %}">Smazat klienta</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'crm_api:logout' %}">Odhlasit se</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>

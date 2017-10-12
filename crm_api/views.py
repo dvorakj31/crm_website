@@ -18,11 +18,6 @@ class CustomerCreateView(LoginRequiredMixin, generic.CreateView):
 
 
 @login_required
-def index(request):
-    return render(request, 'crm_api/index.html')
-
-
-@login_required
 def select_customer(request):
     if request.method == 'POST':
         val = request.POST.get('customer_id')
@@ -36,6 +31,13 @@ def delete_customer(request):
         val = request.POST.get('customer_id')
         return HttpResponseRedirect(reverse('crm_api:delete_customer', kwargs={'pk': val}))
     return render(request, 'crm_api/select_customer.html', {'object_list': Customer.objects.values()})
+
+
+class IndexView(LoginRequiredMixin, generic.ListView):
+    model = Customer
+    template_name = 'crm_api/index.html'
+    context_object_name = 'customer_list'
+    login_url = '/crm/login'
 
 
 class SelectCustomerListView(LoginRequiredMixin, generic.ListView):
@@ -62,6 +64,6 @@ class CustomerDelete(LoginRequiredMixin, generic.DeleteView):
 
 class CustomerList(LoginRequiredMixin, generic.ListView):
     model = Customer
-    template_name = 'crm_api/customer_list.html'
+    template_name = 'crm_api/index.html'
     context_object_name = 'customer_list'
     login_url = '/crm/login/'

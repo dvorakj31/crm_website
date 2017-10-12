@@ -1,12 +1,13 @@
-{% extends 'admin/base.html' %}
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
 
-{% block title %}Login{% endblock %}
-
-{% block content %}
-  <h2>Login</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-  </form>
-{% endblock %}
+<div style="width:30%">
+    <form action="" role="form" method="post" style="margin-right: 50%">
+        {% csrf_token %}
+        {% bootstrap_field form.username layout='inline' %}
+        {% bootstrap_field form.password layout='inline' %}
+        {% buttons submit='Login' layout='inline' %}{% endbuttons %}
+    </form>
+</div>
