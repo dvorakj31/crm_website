@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 
 # Login settings
 LOGIN_REDIRECT_URL = '/crm'
-LOGIN_URL= "/crm/login/"
+LOGIN_URL = "/crm/login/"
 
 
 # Application definition
@@ -119,6 +119,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# SESSION SETTINGS
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/

@@ -9,7 +9,10 @@
                     {{ customer.address }}
                 </td>
                 <td>
-                    <a href="{% url 'crm_api:delete_customer' pk=customer.id %}">Smazat</a>
+                    <form method="POST" action="{% url "crm_api:delete_customer" pk=customer.id %}">
+                        {% csrf_token %}
+                        <input type="submit" value="Smazat" class="btn-link" onclick="return confirm('Opravdu chcete smazat klienta {{ customer.name }}?')">
+                    </form>
                 </td>
                 <td>
                     <a href="{% url 'crm_api:edit' pk=customer.id %}">Upravit</a>
