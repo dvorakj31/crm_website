@@ -1,6 +1,19 @@
 <table summary="vypis klientu" class="table table-bordered sortable table-hover">
-    <tr><th>Nazev spolecnosti</th><th>adresa</th></tr>
+    <tr><th>Nazev spolecnosti</th><th>adresa</th><th>Smazat</th><th>Upravit</th></tr>
         {% for customer in customer_list %}
-            <tr><td>{{ customer.name }}</td><td>{{ customer.address }}</td></tr>
+            <tr>
+                <td>
+                    {{ customer.name }}
+                </td>
+                <td>
+                    {{ customer.address }}
+                </td>
+                <td>
+                    <a href="{% url 'crm_api:delete_customer' pk=customer.id %}">Smazat</a>
+                </td>
+                <td>
+                    <a href="{% url 'crm_api:edit' pk=customer.id %}">Upravit</a>
+                </td>
+            </tr>
         {% endfor %}
 </table>

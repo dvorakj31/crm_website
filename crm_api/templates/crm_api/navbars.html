@@ -4,16 +4,10 @@
             <div id= "navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href="{% url 'crm_api:index' %}">Home</a>
+                        <a href="{% url 'crm_api:index' %}">Hlavni stranka</a>
                     </li>
                     <li>
                         <a href="{% url 'crm_api:create_customer' %}">Vytvorit klienta</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'crm_api:select_customer' %}">Upravit klienta</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'crm_api:delete' %}">Smazat klienta</a>
                     </li>
                     <li>
                         <a href="{% url 'crm_api:logout' %}">Odhlasit se</a>
