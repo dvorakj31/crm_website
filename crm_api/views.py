@@ -13,7 +13,7 @@ class CustomerCreateView(LoginRequiredMixin, generic.CreateView):
     model = Customer
     success_url = '/crm/'
     fields = '__all__'
-    template_name = 'crm_api/client.html'
+    template_name = 'crm_api/table.html'
     login_url = '/crm/login/'
 
 
@@ -49,7 +49,7 @@ class SelectCustomerListView(LoginRequiredMixin, generic.ListView):
 
 class CustomerUpdate(LoginRequiredMixin, generic.UpdateView):
     model = Customer
-    template_name = 'crm_api/client.html'
+    template_name = 'crm_api/table.html'
     fields = '__all__'
     success_url = '/crm/'
     login_url = '/crm/login/'
