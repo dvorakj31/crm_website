@@ -16,6 +16,7 @@ CUSTOMER_LABELS = {
     'var_symbol': 'Variabilni symbol socialniho pojisteni',
     'hea_insurance': 'Zdravotni pojistovna',
     'phone': 'Telefon',
+    'papers': 'Prinesl Doklady',
 }
 
 
@@ -45,6 +46,7 @@ class Customer(models.Model):
     var_symbol = models.CharField(max_length=100, blank=True, null=True, verbose_name=CUSTOMER_LABELS['var_symbol'])
     hea_insurance = models.CharField(max_length=254, blank=True, null=True, verbose_name=CUSTOMER_LABELS['hea_insurance'])
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=CUSTOMER_LABELS['phone'])
+    papers = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['papers'])
 
     def __str__(self):
         return self.name

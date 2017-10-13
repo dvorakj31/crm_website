@@ -1,5 +1,6 @@
+{% load bootstrap3 %}
 <table summary="vypis klientu" class="table table-bordered sortable table-hover">
-    <tr><th>Nazev spolecnosti</th><th>adresa</th><th></th><th></th></tr>
+    <tr><th>Nazev spolecnosti</th><th>adresa</th><th></th><th></th><th>Prinesl doklady</th></tr>
         {% for customer in customer_list %}
             <tr>
                 <td>
@@ -16,6 +17,13 @@
                 </td>
                 <td>
                     <a href="{% url 'crm_api:edit' pk=customer.id %}">Upravit</a>
+                </td>
+                <td>
+                    {% if customer.papers %}
+                        {% bootstrap_icon 'glyphicon glyphicon-ok' %}
+                    {% else %}
+                        {% bootstrap_icon 'glyphicon glyphicon-remove' %}
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
