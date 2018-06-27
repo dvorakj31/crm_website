@@ -1,0 +1,8 @@
+{% if perms.crm_api.can_del_customer %}
+<form method="POST" action="{% url "crm_api:delete_customer" pk=customer.id %}">
+        {% csrf_token %}
+        <input type="submit" value="Smazat" class="btn-link" onclick="return confirm('Opravdu chcete smazat klienta {{ customer.name }}?')">
+</form>
+{% else %}
+-
+{% endif %}

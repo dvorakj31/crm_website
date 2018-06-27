@@ -1,6 +1,6 @@
 {% load bootstrap3 %}
 <table summary="vypis klientu" class="table table-bordered sortable table-hover">
-    <tr><th>Nazev spolecnosti</th><th>adresa</th><th></th><th></th><th>Prinesl doklady</th></tr>
+    <tr><th>Nazev subjektu</th><th>Adresa</th><th></th><th></th><th>Prinesl doklady</th></tr>
         {% for customer in customer_list %}
             <tr>
                 <td>
@@ -9,15 +9,16 @@
                 <td>
                     {{ customer.address }}
                 </td>
-                <td>
-                    <form method="POST" action="{% url "crm_api:delete_customer" pk=customer.id %}">
-                        {% csrf_token %}
-                        <input type="submit" value="Smazat" class="btn-link" onclick="return confirm('Opravdu chcete smazat klienta {{ customer.name }}?')">
-                    </form>
-                </td>
-                <td>
-                    <a href="{% url 'crm_api:edit' pk=customer.id %}">Upravit</a>
-                </td>
+                    <td>
+                        {% include "crm_api/delete_form.html" %}
+                    </td>
+                        <td>
+                            {% if perms.crm_api.can_change_customer %}
+                            <a href="{% url 'crm_api:edit' pk=customer.id %}">Upravit</a>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
                 <td>
                     {% if customer.papers %}
                         {% bootstrap_icon 'glyphicon glyphicon-ok' %}

@@ -2,7 +2,7 @@ from django.db import models
 # Create your models here.
 
 
-class Customer(models.Model):
+class Customer(models.Model):    
     CUSTOMER_LABELS = {
         'name': 'Nazev spolecnosti',
         'address': 'Adresa',
@@ -21,7 +21,8 @@ class Customer(models.Model):
         'road_tax': 'Silnicni dan',
         'property_tax': 'Dan z nemovitosti',
         'moss': 'MOSS',
-        'employer': 'Zamestnavatel'
+        'employer': 'Zamestnavatel',
+        'var_symbol_employees': 'Variabilni symbol zamestnanci'
     }
     CHOICES_VAT = [
         ('mesicne', 'Mesicne'),
@@ -57,6 +58,7 @@ class Customer(models.Model):
     property_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['property_tax'])
     moss = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['moss'])
     is_employer = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['employer'])
+    var_symbol_employees = models.CharField(max_length=100, blank=True, null=True, verbose_name=CUSTOMER_LABELS['var_symbol_employees'])
 
     def __str__(self):
         return self.name

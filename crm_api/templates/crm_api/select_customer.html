@@ -1,5 +1,10 @@
 {% include "crm_api/head.html" %}
-<h1>Vyber klienta k uprave</h1>
+{% load bootstrap3 %}
+<h1>Vyhledat klienta</h1>
+<form id="searchform" action="{% url 'crm_api:select_customer' %}" method="get" accept-charset="utf-8">
+    <input class="searchfield" id="searchbox" name="q" type="text" placeholder="Vyhledat klienta">
+</form>
+{% if perms.crm_api.can_change_customer %}
 <form method="post" action="">
     {% csrf_token %}
         <select id="customer_id" name="customer_id">
@@ -9,3 +14,29 @@
         </select>
     <input type="submit" value="Vyber"/>
 </form>
+{% endif %}
+{% if query_set %}
+    <div class="container" id="query_set">
+        <table summary="vypis klientu" class="table table-bordered sortable table-hover">
+            <tr><th>Nazev subjektu</th><th>Prinesl doklady</th></tr>
+                {% for customer in query_set %}
+                <tr>
+                    <td>
+                        {% if perms.crm_api.can_change_customer %}
+                            <a href="{% url 'crm_api:edit' pk=customer.id %}" style="font-size: 30px;">{{ customer.name }}</a>
+                        {% else %}
+                            {{ customer.name }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if customer.papers %}
+                            {% bootstrap_icon 'glyphicon glyphicon-ok' %}
+                        {% else %}
+                            {% bootstrap_icon 'glyphicon glyphicon-remove' %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+        </table>
+    </div>
+{% endif %}
