@@ -14,4 +14,6 @@ urlpatterns = [
     url(r'^login/$', auth_views.login, {'template_name': 'crm_api/login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/crm'}, name='logout'),
     url(r'^client_list/$', views.CustomerList.as_view(), name='client_list'),
+    url(r'^settings/$', views.settings, name='settings'),
+    url(r'^change_password/$', views.change_password, name='change_password')
 ]
