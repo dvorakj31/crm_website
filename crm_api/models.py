@@ -4,7 +4,7 @@ from django.db import models
 
 class Customer(models.Model):    
     CUSTOMER_LABELS = {
-        'name': 'Nazev spolecnosti',
+        'name': 'Nazev subjektu',
         'address': 'Adresa',
         'ico': 'ICO',
         'dic': 'DIC',
@@ -33,8 +33,8 @@ class Customer(models.Model):
         ('po', 'Pravnicka osoba')
     ]
     TAX_TERMS = [
-        ('radny', 'Radny termin (1.4)'),
-        ('odlozeny', 'Odlozeny termin (1.7)')
+        ('radny', 'Radny termin (1.4.)'),
+        ('odlozeny', 'Odlozeny termin (1.7.)')
     ]
     name = models.CharField(max_length=100, unique=True, verbose_name=CUSTOMER_LABELS['name'])
     address = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['address'])

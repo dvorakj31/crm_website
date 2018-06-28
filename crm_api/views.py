@@ -9,10 +9,9 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django import forms
-import operator
-from django.db.models import Q
 
 # Create your views here.
+
 
 @login_required
 def settings(request):
@@ -39,12 +38,21 @@ def select_customer(request):
 
 
 @login_required
-@permission_required('crm_api.can_del_customer')
+@permission_required('crm_api.delete_customer')
 def delete_customer(request):
     if request.method == 'POST':
         val = request.POST.get('customer_id')
         return HttpResponseRedirect(reverse('crm_api:delete_customer', kwargs={'pk': val}))
     return render(request, 'crm_api/select_customer.html', {'object_list': Customer.objects.values()})
+
+
+@login_required
+def edit_papers(request, cust_id):
+    customer = Customer.objects.get(pk=cust_id)
+    if customer:
+        customer.papers = not customer.papers
+        customer.save()
+    return HttpResponseRedirect('/crm')
 
 
 @login_required
@@ -66,7 +74,7 @@ def change_password(request):
 
 
 class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
-    permission_required = 'crm_api.can_add_customer'
+    permission_required = 'crm_api.add_customer'
     model = Customer
     success_url = '/crm/'
     fields = '__all__'
@@ -104,7 +112,7 @@ class SelectCustomerListView(LoginRequiredMixin, generic.ListView):
 
 
 class CustomerUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.UpdateView):
-    permission_required = 'crm_api.can_change_customer'
+    permission_required = 'crm_api.change_customer'
     model = Customer
     template_name = 'crm_api/update_customer.html'
     fields = '__all__'
@@ -113,7 +121,7 @@ class CustomerUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.Update
 
 
 class CustomerDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.DeleteView):
-    permission_required = 'crm_api.can_del_customer'
+    permission_required = 'crm_api.delete_customer'
     model = Customer
     success_url = reverse_lazy('crm_api:index')
     fields = ['name']

@@ -2,9 +2,9 @@
 {% load bootstrap3 %}
 <h1>Vyhledat klienta</h1>
 <form id="searchform" action="{% url 'crm_api:select_customer' %}" method="get" accept-charset="utf-8">
-    <input class="searchfield" id="searchbox" name="q" type="text" placeholder="Vyhledat klienta">
+    <input class="searchfield" id="searchbox" name="q" type="search" placeholder="Vyhledat klienta">
 </form>
-{% if perms.crm_api.can_change_customer %}
+{% if perms.crm_api.change_customer %}
 <form method="post" action="">
     {% csrf_token %}
         <select id="customer_id" name="customer_id">
@@ -22,7 +22,7 @@
                 {% for customer in query_set %}
                 <tr>
                     <td>
-                        {% if perms.crm_api.can_change_customer %}
+                        {% if perms.crm_api.change_customer %}
                             <a href="{% url 'crm_api:edit' pk=customer.id %}" style="font-size: 30px;">{{ customer.name }}</a>
                         {% else %}
                             {{ customer.name }}
@@ -34,6 +34,13 @@
                         {% else %}
                             {% bootstrap_icon 'glyphicon glyphicon-remove' %}
                         {% endif %}
+                    <a href="{% url 'crm_api:edit_papers' customer.id %}">
+                        {% if customer.papers %}
+                            Neprinesl
+                        {% else %}
+                            Prinesl
+                        {% endif %}
+                    </a>
                     </td>
                 </tr>
                 {% endfor %}

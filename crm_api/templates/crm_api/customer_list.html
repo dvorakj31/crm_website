@@ -13,7 +13,7 @@
                         {% include "crm_api/delete_form.html" %}
                     </td>
                         <td>
-                            {% if perms.crm_api.can_change_customer %}
+                            {% if perms.crm_api.change_customer %}
                             <a href="{% url 'crm_api:edit' pk=customer.id %}">Upravit</a>
                             {% else %}
                             -
@@ -25,6 +25,13 @@
                     {% else %}
                         {% bootstrap_icon 'glyphicon glyphicon-remove' %}
                     {% endif %}
+                    <a href="{% url 'crm_api:edit_papers' customer.id %}">
+                        {% if customer.papers %}
+                            Neprinesl
+                        {% else %}
+                            Prinesl
+                        {% endif %}
+                    </a>
                 </td>
             </tr>
         {% endfor %}

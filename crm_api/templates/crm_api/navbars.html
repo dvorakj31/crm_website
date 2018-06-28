@@ -6,7 +6,7 @@
                     <li>
                         <a href="{% url 'crm_api:index' %}">Hlavni stranka</a>
                     </li>
-                    {% if perms.crm_api.can_add_customer %}
+                    {% if perms.crm_api.add_customer %}
                     <li>
                         <a href="{% url 'crm_api:create_customer' %}">Vytvorit klienta</a>
                     </li>
