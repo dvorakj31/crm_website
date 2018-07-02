@@ -15,7 +15,7 @@ from django import forms
 
 @login_required
 def settings(request):
-    return render(request, 'crm_api/settings.html')
+    return render(request, 'crm_api/html/settings.html')
 
 
 @login_required
@@ -23,8 +23,8 @@ def find_customer(request):
     if request.method == 'GET':
         search_query = request.GET.get('q', None)
         query_set = Customer.objects.filter(name__contains='%s' % search_query)
-        return render(request, 'crm_api/select_customer.html', {'query_set': query_set, 'object_list': Customer.objects.values()})
-    return render(request, 'crm_api/select_customer.html', {'object_list': Customer.objects.values()})
+        return render(request, 'crm_api/html/select_customer.html', {'query_set': query_set, 'object_list': Customer.objects.values()})
+    return render(request, 'crm_api/html/select_customer.html', {'object_list': Customer.objects.values()})
 
 
 @login_required
@@ -34,7 +34,7 @@ def select_customer(request):
     elif request.method == 'POST':
         val = request.POST.get('customer_id')
         return HttpResponseRedirect(reverse('crm_api:edit', kwargs={'pk': val}))
-    return render(request, 'crm_api/select_customer.html', {'object_list': Customer.objects.values()})
+    return render(request, 'crm_api/html/select_customer.html', {'object_list': Customer.objects.values()})
 
 
 @login_required
@@ -43,7 +43,7 @@ def delete_customer(request):
     if request.method == 'POST':
         val = request.POST.get('customer_id')
         return HttpResponseRedirect(reverse('crm_api:delete_customer', kwargs={'pk': val}))
-    return render(request, 'crm_api/select_customer.html', {'object_list': Customer.objects.values()})
+    return render(request, 'crm_api/html/select_customer.html', {'object_list': Customer.objects.values()})
 
 
 @login_required
@@ -68,9 +68,16 @@ def change_password(request):
             pass  # messages.error(request, 'Prosim, opravte chyby nize')
     else:
         form = CustomPasswordChangeForm(request.user)
-    return render(request, 'crm_api/change_password.html', {
+    return render(request, 'crm_api/html/change_password.html', {
         'form': form
     })
+
+
+@login_required
+def set_emails(request):
+    if request.method == 'POST':
+        print(request.get_full_path())
+    return render(request, 'crm_api/html/set_emails.html')
 
 
 class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
@@ -78,7 +85,7 @@ class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.Cr
     model = Customer
     success_url = '/crm/'
     fields = '__all__'
-    template_name = 'crm_api/create_customer.html'
+    template_name = 'crm_api/html/create_customer.html'
     login_url = '/crm/login/'
 
 
@@ -99,14 +106,14 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 
 class IndexView(LoginRequiredMixin, generic.ListView):
     model = Customer
-    template_name = 'crm_api/index.html'
+    template_name = 'crm_api/html/index.html'
     context_object_name = 'customer_list'
     login_url = '/crm/login'
 
 
 class SelectCustomerListView(LoginRequiredMixin, generic.ListView):
     model = Customer
-    template_name = 'crm_api/select_customer.html'
+    template_name = 'crm_api/html/select_customer.html'
     context_object_name = 'object_list'
     login_url = '/crm/login/'
 
@@ -114,7 +121,7 @@ class SelectCustomerListView(LoginRequiredMixin, generic.ListView):
 class CustomerUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.UpdateView):
     permission_required = 'crm_api.change_customer'
     model = Customer
-    template_name = 'crm_api/update_customer.html'
+    template_name = 'crm_api/html/update_customer.html'
     fields = '__all__'
     success_url = '/crm/'
     login_url = '/crm/login/'
@@ -130,6 +137,6 @@ class CustomerDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.Delete
 
 class CustomerList(LoginRequiredMixin, generic.ListView):
     model = Customer
-    template_name = 'crm_api/index.html'
+    template_name = 'crm_api/html/index.html'
     context_object_name = 'customer_list'
     login_url = '/crm/login/'

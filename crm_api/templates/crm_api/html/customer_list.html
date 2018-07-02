@@ -10,7 +10,7 @@
                     {{ customer.address }}
                 </td>
                     <td>
-                        {% include "crm_api/delete_form.html" %}
+                        {% include "crm_api/html/delete_form.html" %}
                     </td>
                         <td>
                             {% if perms.crm_api.change_customer %}
@@ -25,13 +25,15 @@
                     {% else %}
                         {% bootstrap_icon 'glyphicon glyphicon-remove' %}
                     {% endif %}
-                    <a href="{% url 'crm_api:edit_papers' customer.id %}">
+                    {% buttons button_type="link" button_class="btn-primary" %}
+                        <a href="{% url 'crm_api:edit_papers' customer.id %}">
                         {% if customer.papers %}
                             Neprinesl
                         {% else %}
                             Prinesl
                         {% endif %}
-                    </a>
+                        </a>
+                    {% endbuttons %}
                 </td>
             </tr>
         {% endfor %}
