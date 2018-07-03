@@ -1,14 +1,10 @@
 {% include "crm_api/html/head.html" %}
-{% include "crm_api/html/navbars.html" %}
 {% load bootstrap3 %}
-{% block 'create_email' %}
 {% buttons %}
 <a class="btn-link" href="{% url 'crm_api:create_email' %}">
     Vytvorit email
 </a>
 {% endbuttons %}
-{% endblock 'create_email' %}
-{% block 'edit_email' %}
 {% if object_list and perms.crm_api.change_warningemail %}
 <form method="post" action="">
     {% csrf_token %}
@@ -20,4 +16,3 @@
     <input type="submit" value="Vyber"/>
 </form>
 {% endif %}
-{% endblock 'edit_email' %}
