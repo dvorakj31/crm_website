@@ -1,12 +1,4 @@
+{% load bootstrap3%}
 {% include 'crm_api/html/head.html' %}
 {% include "crm_api/js/customer_table.js" %}
-{% load bootstrap3 %}
-{% if form %}
-    <form action="" method="post">
-        <table style="color:black;text-align:left; margin-left: 20px;">
-            {% csrf_token %}
-            {{ form.as_table }}
-        </table>
-        {% buttons submit='Ulozit' %}{% endbuttons %}
-    </form>
-{% endif %}
+{% include 'crm_api/html/form_table.html' %}

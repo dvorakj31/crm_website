@@ -1,29 +1,23 @@
 {% include "crm_api/html/head.html" %}
 {% include "crm_api/html/navbars.html" %}
-{% comment %} <tr><th><label for="id_name">Nazev subjektu:</label></th><td><input type="text" name="name" maxlength="100" id="id_name" required /></td></tr> {% endcomment %}
-<body>
-    <div class="emails">
-        <form action="" method="post">
-            {% csrf_token %}
-            <table style="color:black;text-align:lleft; margin-left: 20px;">
-                <tr>
-                    <th><label for="subject_email1">Predmet emailu 1:</label></th>
-                    <td><input type="text" id="subject_email1" placeholder="Zadejte predmet emailu 1" required/></td>
-                    <td><label for="subject_email2">Predmet emailu 2:</label></td>
-                    <td><input type="text" id="subject_email2" placeholder="Zadejte predmet emailu 2" required/></td>
-                    <td><label for="subject_email3">Predmet emailu 3:</label></td>
-                    <td><input type="text" id="subject_email3" placeholder="Zadejte predmet emailu 3" required/></td>
-                </tr>
-                <tr>
-                    <th><label for="email1">Email 1:</label></th>
-                    <td><textarea id="email1" rows="5" cols="40" required placeholder="Vyplnte telo emailu 1"></textarea></td>
-                    <th><label for="email2">Email 2:</label></th>
-                    <td><textarea id="email2" rows="5" cols="40" required placeholder="Vyplnte telo emailu 2"></textarea></td>
-                    <th><label for="email3">Email 3:</label></th>
-                    <td><textarea id="email3" rows="5" cols="40" required placeholder="Vyplnte telo emailu 3"></textarea></td>
-                </tr>
-            </table>
-            <input type="submit" value="Ulozit"/>
-        </form>
-    </div>
-</body>
+{% load bootstrap3 %}
+{% block 'create_email' %}
+{% buttons %}
+<a class="btn-link" href="{% url 'crm_api:create_email' %}">
+    Vytvorit email
+</a>
+{% endbuttons %}
+{% endblock 'create_email' %}
+{% block 'edit_email' %}
+{% if object_list and perms.crm_api.change_warningemail %}
+<form method="post" action="">
+    {% csrf_token %}
+        <select id="warningemail_id" name="warningemail_id">
+            {% for mail in object_list %}
+                <option value="{{mail.id}}">{{mail.name}}</option>
+            {% endfor %}
+        </select>
+    <input type="submit" value="Vyber"/>
+</form>
+{% endif %}
+{% endblock 'edit_email' %}

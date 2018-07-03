@@ -1,5 +1,5 @@
 from django import forms
-from .models import Customer
+from .models import Customer, WarningEmail
 
 
 class CustomerForm(forms.ModelForm):
@@ -20,4 +20,16 @@ class CustomerForm(forms.ModelForm):
             'phone': 'Telefon',
             'tax_type': 'Typ dane',
             'tax_term': 'Termin dane'
+        }
+
+
+class WarningEmailForm(forms.ModelForm):
+    class Meta:
+        model = WarningEmail
+        exclude = ()
+        label = {
+            'name': 'Nazev'
+            'subject': 'Predmet',
+            'body': 'Telo',
+            'email_type': 'Druh varovani',
         }

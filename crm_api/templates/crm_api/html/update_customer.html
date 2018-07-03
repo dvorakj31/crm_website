@@ -1,2 +1,5 @@
 {% include "crm_api/html/create_customer.html" %}
-{% include "crm_api/html/delete_form.html" %}
+{% if perms.crm_api.delete_customer %}
+    {% url "crm_api:delete_customer" pk=customer.id as url_arg %}
+    {% include "crm_api/html/delete_form.html" with action_arg=url_arg name_arg=customer.name %}
+{% endif %}

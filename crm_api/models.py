@@ -62,3 +62,18 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class WarningEmail(models.Model):
+    MAIL_TYPES = [
+        ('lvl1', 'Prvni varovani'),
+        ('lvl2', 'Druhe varovani'),
+        ('lvl3', 'Treti varovani'),
+    ]
+    name = models.CharField(max_length=20, verbose_name='Nazev')
+    subject = models.CharField(max_length=20, verbose_name='Predmet')
+    body = models.TextField(max_length=500, verbose_name='Telo')
+    mail_type = models.CharField(max_length=20, choices=MAIL_TYPES, default='lvl1',
+                                verbose_name='Druh varovani')
+    def __str__(self):
+        return self.name

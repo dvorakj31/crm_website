@@ -1,20 +1,8 @@
 {% include "crm_api/html/head.html" %}
 {% load bootstrap3 %}
 <h1>Vyhledat klienta</h1>
-<form id="searchform" action="{% url 'crm_api:select_customer' %}" method="get" accept-charset="utf-8">
-    <input class="searchfield" id="searchbox" name="q" type="search" placeholder="Vyhledat klienta">
-</form>
-{% if object_list and perms.crm_api.change_customer %}
-<form method="post" action="">
-    {% csrf_token %}
-        <select id="customer_id" name="customer_id">
-            {% for cust in object_list %}
-                <option value="{{cust.id}}">{{cust.name}}</option>
-            {% endfor %}
-        </select>
-    <input type="submit" value="Vyber"/>
-</form>
-{% endif %}
+{% url 'crm_api:select_customer' arg arg2 as url_arg %}
+{% include 'crm_api/html/search_form.html' with action_arg=url_arg ph_arg='Vyhledat klienta' %}
 {% if query_set %}
     <div class="container" id="query_set">
         <table summary="vypis klientu" class="table table-bordered sortable table-hover">

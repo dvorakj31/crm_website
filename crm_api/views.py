@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render, redirect
 from django.views import generic
-from .models import Customer
+from .models import Customer, WarningEmail
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib import messages
@@ -16,6 +16,15 @@ from django import forms
 @login_required
 def settings(request):
     return render(request, 'crm_api/html/settings.html')
+
+
+@login_required
+@permission_required('crm_api.add_warningemail')
+def set_emails(request):
+    if request.method == 'POST':
+        val = request.POST.get('warningemail_id')
+        return HttpResponseRedirect(reverse('crm_api:edit_email', kwargs={'pk': val}))
+    return render(request, 'crm_api/html/set_emails.html', {'object_list': WarningEmail.objects.values()})
 
 
 @login_required
@@ -73,11 +82,30 @@ def change_password(request):
     })
 
 
-@login_required
-def set_emails(request):
-    if request.method == 'POST':
-        print(request.get_full_path())
-    return render(request, 'crm_api/html/set_emails.html')
+class WarningEmailCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
+    permission_required = 'crm_api.add_warningemail'
+    model = WarningEmail
+    success_url = '/crm/set_emails'
+    fields = '__all__'
+    template_name = 'crm_api/html/create_email.html'
+    login_url = '/crm/login/'
+
+
+class WarningEmailUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.UpdateView):
+    permission_required = 'crm_api.change_warningemail'
+    model = WarningEmail
+    template_name = 'crm_api/html/update_email.html'
+    fields = '__all__'
+    success_url = '/crm/set_emails'
+    login_url = '/crm/login/'
+
+
+class WarningEmailDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.DeleteView):
+    permission_required = 'crm_api.delete_warningemail'
+    model = WarningEmail
+    success_url = reverse_lazy('crm_api:index')
+    fields = ['name']
+    login_url = '/crm/login/'
 
 
 class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
