@@ -31,8 +31,12 @@ def set_emails(request):
 def find_customer(request):
     if request.method == 'GET':
         search_query = request.GET.get('q', None)
+        search_filter = request.GET.get('filter_papers', None)
         query_set = Customer.objects.filter(name__contains='%s' % search_query)
-        return render(request, 'crm_api/html/select_customer.html', {'query_set': query_set, 'object_list': Customer.objects.values()})
+        if search_filter != 'all':
+            query_set = query_set.filter(papers__exact=search_filter == 'yes')
+        return render(request, 'crm_api/html/select_customer.html', {'query_set': query_set,
+                                                                     'object_list': Customer.objects.values()})
     return render(request, 'crm_api/html/select_customer.html', {'object_list': Customer.objects.values()})
 
 
