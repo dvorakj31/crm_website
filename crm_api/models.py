@@ -44,7 +44,7 @@ class Customer(models.Model):
     email = models.EmailField(max_length=254, blank=True, null=True, verbose_name=CUSTOMER_LABELS['email'])
     tax_type = models.CharField(max_length=20, choices=TAX_TYPES, default='fo',
                                 verbose_name=CUSTOMER_LABELS['tax_type'])
-    tax_term = models.CharField(max_length=25, choices=TAX_TERMS, null=True, verbose_name=CUSTOMER_LABELS['tax_term'])
+    tax_term = models.CharField(max_length=25, choices=TAX_TERMS, null=True, default='radny', verbose_name=CUSTOMER_LABELS['tax_term'])
     vat = models.CharField(max_length=20, choices=CHOICES_VAT, null=True, blank=True,
                            verbose_name=CUSTOMER_LABELS['vat'])
     tax_office = models.CharField(max_length=254, blank=True, null=True, verbose_name=CUSTOMER_LABELS['tax_office'])

@@ -1,14 +1,17 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.shortcuts import render, redirect
-from django.views import generic
-from .models import Customer, WarningEmail
-from django.urls import reverse, reverse_lazy
-from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.views import generic
 from django import forms
+from .models import Customer, WarningEmail
+
+PAGE_NUM = 7
 
 # Create your views here.
 
@@ -33,7 +36,7 @@ def find_customer(request):
         search_query = request.GET.get('q', None)
         search_filter = request.GET.get('filter_papers', None)
         query_set = Customer.objects.filter(name__contains='%s' % search_query)
-        if search_filter != 'all':
+        if search_filter != 'all' and search_filter in ['yes', 'no']:
             query_set = query_set.filter(papers__exact=search_filter == 'yes')
         return render(request, 'crm_api/html/select_customer.html', {'query_set': query_set,
                                                                      'object_list': Customer.objects.values()})
@@ -170,5 +173,5 @@ class CustomerDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.Delete
 class CustomerList(LoginRequiredMixin, generic.ListView):
     model = Customer
     template_name = 'crm_api/html/index.html'
-    context_object_name = 'customer_list'
     login_url = '/crm/login/'
+    paginate_by = PAGE_NUM
