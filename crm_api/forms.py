@@ -28,7 +28,7 @@ class WarningEmailForm(forms.ModelForm):
         model = WarningEmail
         exclude = ()
         label = {
-            'name': 'Nazev'
+            'name': 'Nazev',
             'subject': 'Predmet',
             'body': 'Telo',
             'email_type': 'Druh varovani',

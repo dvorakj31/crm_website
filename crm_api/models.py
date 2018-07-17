@@ -2,6 +2,10 @@ from django.db import models
 # Create your models here.
 
 
+def customer_directory_path(instance, filename):
+    return 'user_{0}/{1}'.format(instance.id, filename)
+
+
 class Customer(models.Model):    
     CUSTOMER_LABELS = {
         'name': 'Nazev subjektu',
@@ -44,7 +48,8 @@ class Customer(models.Model):
     email = models.EmailField(max_length=254, blank=True, null=True, verbose_name=CUSTOMER_LABELS['email'])
     tax_type = models.CharField(max_length=20, choices=TAX_TYPES, default='fo',
                                 verbose_name=CUSTOMER_LABELS['tax_type'])
-    tax_term = models.CharField(max_length=25, choices=TAX_TERMS, null=True, default='radny', verbose_name=CUSTOMER_LABELS['tax_term'])
+    tax_term = models.CharField(max_length=25, choices=TAX_TERMS, null=True, default='radny',
+                                verbose_name=CUSTOMER_LABELS['tax_term'])
     vat = models.CharField(max_length=20, choices=CHOICES_VAT, null=True, blank=True,
                            verbose_name=CUSTOMER_LABELS['vat'])
     tax_office = models.CharField(max_length=254, blank=True, null=True, verbose_name=CUSTOMER_LABELS['tax_office'])
@@ -58,7 +63,9 @@ class Customer(models.Model):
     property_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['property_tax'])
     moss = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['moss'])
     is_employer = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['employer'])
-    var_symbol_employees = models.CharField(max_length=100, blank=True, null=True, verbose_name=CUSTOMER_LABELS['var_symbol_employees'])
+    var_symbol_employees = models.CharField(max_length=100, blank=True, null=True,
+                                            verbose_name=CUSTOMER_LABELS['var_symbol_employees'])
+    files = models.FileField(upload_to=customer_directory_path, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -73,7 +80,7 @@ class WarningEmail(models.Model):
     name = models.CharField(max_length=20, verbose_name='Nazev')
     subject = models.CharField(max_length=20, verbose_name='Predmet')
     body = models.TextField(max_length=500, verbose_name='Telo')
-    mail_type = models.CharField(max_length=20, choices=MAIL_TYPES, default='lvl1',
-                                verbose_name='Druh varovani')
+    mail_type = models.CharField(max_length=20, choices=MAIL_TYPES, default='lvl1', verbose_name='Druh varovani')
+
     def __str__(self):
         return self.name
