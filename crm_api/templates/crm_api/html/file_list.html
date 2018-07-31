@@ -1,0 +1,27 @@
+{% extends "crm_api/html/_paginate_table.html" %}
+{% load bootstrap3 %}
+{% include 'crm_api/html/head.html' %}
+{% block table_head %}
+<thead>
+    <tr>
+        <th>Soubory klienta {{ name }}</th>
+    </tr>
+</thead>
+{% endblock table_head %}
+{% block table_body %}
+{% if files %}
+<tbody>
+    {% for file in files  %}
+        <tr>
+            <td>
+                {{ file.files }}
+            </td>
+            <td>
+                {% url "crm_api:delete_file" pk=file.files.id as url_arg %}
+                {% include "crm_api/html/delete_form.html" with action_arg=url_arg name_arg=file.files %}
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+{% endif %}
+{% endblock table_body %}

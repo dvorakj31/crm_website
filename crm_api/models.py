@@ -3,7 +3,7 @@ from django.db import models
 
 
 def customer_directory_path(instance, filename):
-    return 'user_{0}/{1}'.format(instance.id, filename)
+    return 'user_{0}/{1}'.format(instance.customer.id, filename)
 
 
 class Customer(models.Model):    
@@ -65,10 +65,14 @@ class Customer(models.Model):
     is_employer = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['employer'])
     var_symbol_employees = models.CharField(max_length=100, blank=True, null=True,
                                             verbose_name=CUSTOMER_LABELS['var_symbol_employees'])
-    files = models.FileField(upload_to=customer_directory_path, blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+
+class CustomerFiles(models.Model):
+    files = models.FileField(upload_to=customer_directory_path)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='files')
 
 
 class WarningEmail(models.Model):

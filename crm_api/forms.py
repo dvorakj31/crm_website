@@ -1,5 +1,5 @@
 from django import forms
-from .models import Customer, WarningEmail
+from .models import Customer, WarningEmail, CustomerFiles
 
 
 class CustomerForm(forms.ModelForm):
@@ -21,6 +21,11 @@ class CustomerForm(forms.ModelForm):
             'tax_type': 'Typ dane',
             'tax_term': 'Termin dane'
         }
+
+
+class CustomerFilesForm:
+    class Meta:
+        model = CustomerFiles
 
 
 class WarningEmailForm(forms.ModelForm):

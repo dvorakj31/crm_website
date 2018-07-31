@@ -20,4 +20,7 @@ urlpatterns = [
     url(r'^create_email/$', views.WarningEmailCreateView.as_view(), name='create_email'),
     url(r'^edit_email/(?P<pk>[0-9]+)/$', views.WarningEmailUpdate.as_view(), name='edit_email'),
     url(r'^delete_email/(?P<pk>[0-9]+)/$', views.WarningEmailDelete.as_view(), name='delete_email'),
+    url(r'^list_files/(?P<cust_id>[0-9]+)/$', views.CustomerFilesList.as_view(), name='list_files'),
+    url(r'^add_file/(?P<cust_id>[0-9]+)/$', views.CustomerFilesCreateView.as_view(), name='add_file'),
+    url(r'^delete_file/(?P<pk>[0-9]+)/$', views.CustomerFilesDelete.as_view(), name='delete_file'),
 ]
