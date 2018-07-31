@@ -36,6 +36,6 @@ $(document).ready(function(){
             $('label[for="id_hea_insurance"]').show();
         }
     });
-    
+
 })
 </script>

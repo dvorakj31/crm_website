@@ -1,0 +1,51 @@
+{% load bootstrap3 %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% bootstrap_messages %}
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+        }
+        .navbar-right {
+            padding-right: 10px;
+        }
+    </style>
+
+    {% block head %}
+    {% endblock %}
+</head>
+<body>
+    <div class="container clearfix">
+        <nav class = "navbar navbar-inverse navbar-fixed-top" id="navbar_whole">
+            <div id= "navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="{% url 'crm_api:index' %}">Hlavni stranka</a>
+                    </li>
+                        {% if perms.crm_api.add_customer %}
+                            <li>
+                                <a href="{% url 'crm_api:create_customer' %}">Vytvorit klienta</a>
+                            </li>
+                        {% endif %}
+{#                        <li>#}
+{#                            <a href="{% url 'crm_api:select_customer' %}">Vyhledat klienta</a>#}
+{#                        </li>#}
+    {#                    <li>#}
+    {#                        <a href="{% url 'crm_api:settings' %}">Nastaveni</a>#}
+    {#                    </li>#}
+                </ul>
+                <ul class = "nav navbar-nav navbar-right">
+                    <li>
+                        <a href="{% url 'crm_api:logout' %}">Odhlasit se</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    {% block body_content %}
+    {% endblock body_content %}
+</body>
+</html>
