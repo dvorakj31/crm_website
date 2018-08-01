@@ -9,6 +9,6 @@
         </button>
         {% endbuttons %}
     </form>
-    <a href="{% url 'crm_api:list_files' cust_id=customer.id %}">Soubory klienta</a>
-    <a href="{% url 'crm_api:add_file' cust_id=customer.id %}">Pridat soubory</a>
+    <a href="{% url 'crm_api:list_files' cust_id=customer.id %}" style="font-size: 30px;">Soubory klienta</a><br>
+    <a href="{% url 'crm_api:add_file' cust_id=customer.id %}" style="font-size: 30px;">Pridat soubory</a>
 {% endblock %}
