@@ -171,6 +171,15 @@ class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.D
     fields = ['files']
     login_url = '/crm/login/'
 
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        print('trying to delete', os.path.join(settings.MEDIA_ROOT, str(obj.files)))
+        try:
+            os.remove(os.path.join(settings.MEDIA_ROOT, str(obj.files)))
+        except:
+            pass
+        return super(CustomerFilesDelete, self).delete(request, args, kwargs)
+    
 
 # Settings views starts here
 class CustomPasswordChangeForm(PasswordChangeForm):
