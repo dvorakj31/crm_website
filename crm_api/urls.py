@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^list_files/(?P<cust_id>[0-9]+)/$', views.CustomerFilesList.as_view(), name='list_files'),
     url(r'^add_file/(?P<cust_id>[0-9]+)/$', views.CustomerFilesCreateView.as_view(), name='add_file'),
     url(r'^delete_file/(?P<pk>[0-9]+)/$', views.CustomerFilesDelete.as_view(), name='delete_file'),
+    url(r'^download_file/(?P<file_id>[0-9]+)/$', views.download_file, name='download_file'),
     url(r'^edit_papers/(?P<cust_id>[0-9]+)/$', views.edit_papers, name='edit_papers'),
     url(r'^login/$', auth_views.login, {'template_name': 'crm_api/html/login.html'}, name='login'),
     url(r'^logout/$', auth_views.logout, {'next_page': '/crm'}, name='logout'),
