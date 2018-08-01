@@ -1,0 +1,12 @@
+{% extends 'crm_api/html/create_email.html' %}
+{% load bootstrap3 %}
+{% block content %}
+    <form method="POST" action="{% url "crm_api:delete_email" pk=warningemail.id %}">
+        {% csrf_token %}
+        {% buttons %}
+        <button class="btn btn-default" type="submit" onclick="return confirm('Opravdu chcete smazat {{ warningemail.name }}?')">
+            Smazat
+        </button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
