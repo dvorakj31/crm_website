@@ -31,16 +31,16 @@ def download_file(request, file_id):
     cust_file = get_object_or_404(CustomerFiles, pk=file_id)
     file_name = str(cust_file.files)
     mime = mimetypes.guess_type(file_name)
-    if mime[0] == None:
+    if mime[0] is None:
         mime = ('application/octet-stream', None)
-    response = FileResponse(cust_file.files, content_type = 'file/%s' % mime[0].split('/')[1])
+    response = FileResponse(cust_file.files, content_type='file/%s' % mime[0].split('/')[1])
     response['Content-Disposition'] = "attachment;filename=%s" % file_name.split('/')[1]
     return response
 
 
 @login_required
 def select_customer(request):
-    return render(request, 'crm_api/html/_search.html')
+    return render(request, 'crm_api/html/search_page.html')
 
 
 @login_required
@@ -73,7 +73,8 @@ def set_emails(request):
         val = request.POST.get('warningemail_id')
         return HttpResponseRedirect(reverse('crm_api:edit_email', kwargs={'pk': val}))
     return render(request, 'crm_api/html/set_emails.html', {'object_list': WarningEmail.objects.values()})
-    
+
+
 # Customer views starts here
 class CustomerSearchList(LoginRequiredMixin, generic.ListView):
     model = Customer
@@ -85,8 +86,9 @@ class CustomerSearchList(LoginRequiredMixin, generic.ListView):
         query_set = Customer.objects.all()
         search_query = self.request.GET.get('q', None)
         search_filter = self.request.GET.get('filter_papers', None)
-        query_set = Customer.objects.filter(name__contains='%s' % search_query)
-        if search_filter != 'all' and search_filter in ['yes', 'no']:
+        if search_query is not None:
+            query_set = Customer.objects.filter(name__contains='%s' % search_query)
+        if search_filter in ['yes', 'no']:
             query_set = query_set.filter(papers__exact=search_filter == 'yes')
         return query_set
 
@@ -159,7 +161,7 @@ class CustomerFilesList(LoginRequiredMixin, generic.ListView):
         context = super(CustomerFilesList, self).get_context_data(**kwargs)
         try:
             context['name'] = Customer.objects.get(pk=self.kwargs['cust_id']).name
-        except:
+        except Customer.DoesNotExist:
             context['name'] = ''
         return context
 
@@ -176,7 +178,7 @@ class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.D
         print('trying to delete', os.path.join(settings.MEDIA_ROOT, str(obj.files)))
         try:
             os.remove(os.path.join(settings.MEDIA_ROOT, str(obj.files)))
-        except:
+        except OSError:
             pass
         return super(CustomerFilesDelete, self).delete(request, args, kwargs)
     

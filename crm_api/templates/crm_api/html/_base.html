@@ -1,51 +1,55 @@
 {% load bootstrap3 %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     {% bootstrap_css %}
-    {% bootstrap_javascript %}
+    {% bootstrap_javascript jquery=1 %}
     {% bootstrap_messages %}
-    <style type="text/css">
-        body {
-            padding-top: 50px;
-        }
-        .navbar-right {
-            padding-right: 10px;
-        }
-    </style>
-
     {% block head %}
     {% endblock %}
 </head>
 <body>
-    <div class="container clearfix">
-        <nav class = "navbar navbar-inverse navbar-fixed-top" id="navbar_whole">
-            <div id= "navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>
-                        <a href="{% url 'crm_api:index' %}">Hlavni stranka</a>
-                    </li>
-                        {% if perms.crm_api.add_customer %}
-                            <li>
-                                <a href="{% url 'crm_api:create_customer' %}">Vytvorit klienta</a>
-                            </li>
-                        {% endif %}
-                        <li>
-                            <a href="{% url 'crm_api:select_customer' %}">Vyhledat klienta</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'crm_api:settings' %}">Nastaveni</a>
-                        </li>
-                </ul>
-                <ul class = "nav navbar-nav navbar-right">
-                    <li>
-                        <a href="{% url 'crm_api:logout' %}">Odhlasit se</a>
-                    </li>
-                </ul>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{% url 'crm_api:index' %}">Hlavní stránka</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            {% if perms.crm_api.add_customer %}
+            <li><a href="{% url 'crm_api:create_customer' %}">Vytvořit nového klienta</a></li>
+            {% endif %}
+            <li><a href="{% url 'crm_api:select_customer' %}">Vyhledávání</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Nastavení <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'crm_api:change_password' %}">Změnit heslo</a></li>
+                  {% if perms.crm_api.change_warningemail %}
+                <li><a href="{% url 'crm_api:set_emails' %}">Nastavení emailů</a></li>
+                  {% endif %}
+              </ul>
+            </li>
+          </ul>
+          <form class="navbar-form navbar-left" action="{% url 'crm_api:customer_search_result' %}" id="searchform" method="get" accept-charset="utf-8">
+            <div class="form-group">
+                <input class="form-control" id="searchbox" name="q" type="search" placeholder='Vyhledat klienta' required>
             </div>
-        </nav>
-    </div>
-    {% block body_content %}
-    {% endblock body_content %}
+            <button type="submit" class="btn btn-default">Vyhledat</button>
+          </form>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'crm_api:logout' %}">Odhlásit se</a></li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+{% block body_content %}
+{% endblock body_content %}
 </body>
 </html>

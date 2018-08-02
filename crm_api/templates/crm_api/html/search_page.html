@@ -1,0 +1,11 @@
+{% extends 'crm_api/html/_search.html' %}
+{% load bootstrap3 %}
+{% block search_content %}
+    <p>Vyhledat s filtry</p>
+    <form id="searchform" action="{% url 'crm_api:customer_search_result' %}" method="get" accept-charset="utf-8">
+        <p>Doklady:</p>
+        <input title="brought" type="radio" name="filter_papers" value="yes" checked> Přinesl<br>
+        <input title="not_brought" type="radio" name="filter_papers" value="no"> Nepřinesl
+        {% buttons submit='Vyhledat' %}{% endbuttons %}
+    </form>
+{% endblock %}

@@ -8,37 +8,37 @@ def customer_directory_path(instance, filename):
 
 class Customer(models.Model):    
     CUSTOMER_LABELS = {
-        'name': 'Nazev subjektu',
+        'name': 'Název subjektu',
         'address': 'Adresa',
-        'ico': 'ICO',
-        'dic': 'DIC',
+        'ico': 'IČO',
+        'dic': 'DIČ',
         'email': 'Email',
-        'tax_type': 'Pravni subjekt',
-        'tax_term': 'Termin platce',
+        'tax_type': 'Právní subjekt',
+        'tax_term': 'Termín plátce',
         'vat': 'DPH',
-        'tax_office': 'Financni urad',
-        'soc_insurance': 'Socialni pojistovna',
-        'var_symbol': 'Variabilni symbol socialniho pojisteni',
-        'hea_insurance': 'Zdravotni pojistovna',
+        'tax_office': 'Finanční úřad',
+        'soc_insurance': 'Sociální pojišťovna',
+        'var_symbol': 'Variabilní symbol sociálního pojištění',
+        'hea_insurance': 'Zdravotní pojišťovna',
         'phone': 'Telefon',
-        'papers': 'Prinesl Doklady',
-        'road_tax': 'Silnicni dan',
-        'property_tax': 'Dan z nemovitosti',
+        'papers': 'Přinesl Doklady',
+        'road_tax': 'Silniční daň',
+        'property_tax': 'Daň z nemovitosti',
         'moss': 'MOSS',
-        'employer': 'Zamestnavatel',
-        'var_symbol_employees': 'Variabilni symbol zamestnanci'
+        'employer': 'Zaměstnavatel',
+        'var_symbol_employees': 'Variabilní symbol zaměstnanci'
     }
     CHOICES_VAT = [
-        ('mesicne', 'Mesicne'),
-        ('ctvrtletne', 'Ctvrtletne')
+        ('mesicne', 'Mesíčně'),
+        ('ctvrtletne', 'Čtvrtletně')
     ]
     TAX_TYPES = [
-        ('fo', 'Fyzicka osoba'),
-        ('po', 'Pravnicka osoba')
+        ('fo', 'Fyzická osoba'),
+        ('po', 'Právnická osoba')
     ]
     TAX_TERMS = [
-        ('radny', 'Radny termin (1.4.)'),
-        ('odlozeny', 'Odlozeny termin (1.7.)')
+        ('radny', 'Řádný termín (1.4.)'),
+        ('odlozeny', 'Odložený termín (1.7.)')
     ]
     name = models.CharField(max_length=100, unique=True, verbose_name=CUSTOMER_LABELS['name'])
     address = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['address'])
@@ -77,14 +77,20 @@ class CustomerFiles(models.Model):
 
 class WarningEmail(models.Model):
     MAIL_TYPES = [
-        ('lvl1', 'Prvni varovani'),
-        ('lvl2', 'Druhe varovani'),
-        ('lvl3', 'Treti varovani'),
+        ('lvl1', 'První varování'),
+        ('lvl2', 'Druhé varování'),
+        ('lvl3', 'Třetí varování'),
     ]
-    name = models.CharField(max_length=20, verbose_name='Nazev')
-    subject = models.CharField(max_length=20, verbose_name='Predmet')
-    body = models.TextField(max_length=500, verbose_name='Telo')
-    mail_type = models.CharField(max_length=20, choices=MAIL_TYPES, default='lvl1', verbose_name='Druh varovani')
+
+    DATE_NUMBERS = [
+        (x, y) for x, y in zip([x for x in range(1, 29)], [str(y) for y in range(1, 29)])
+    ]
+
+    name = models.CharField(max_length=20, verbose_name='Název')
+    subject = models.CharField(max_length=20, verbose_name='Předmět')
+    body = models.TextField(max_length=500, verbose_name='Tělo')
+    mail_type = models.CharField(max_length=20, choices=MAIL_TYPES, default='lvl1', verbose_name='Druh varování')
+    send_date = models.IntegerField(choices=DATE_NUMBERS, default=1, verbose_name='Číslo dne odeslání')
 
     def __str__(self):
         return self.name
