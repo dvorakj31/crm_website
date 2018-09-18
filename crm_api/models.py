@@ -1,9 +1,11 @@
 from django.db import models
+from filebrowser.fields import FileBrowseField
+import os
 # Create your models here.
 
 
 def customer_directory_path(instance, filename):
-    return 'user_{0}/{1}'.format(instance.customer.id, filename)
+    return os.path.normpath('user_{0}/{1}'.format(instance.customer.name, filename))
 
 
 class Customer(models.Model):    
@@ -73,6 +75,12 @@ class Customer(models.Model):
 class CustomerFiles(models.Model):
     files = models.FileField(upload_to=customer_directory_path)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='files')
+
+    def filename(self):
+        return os.path.basename(self.files.name)
+
+    def is_dir(self):
+        return os.path.isdir(self.files.name)
 
 
 class WarningEmail(models.Model):

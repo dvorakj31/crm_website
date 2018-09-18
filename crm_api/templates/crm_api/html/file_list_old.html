@@ -1,0 +1,117 @@
+{% extends 'crm_api/html/_base.html' %}
+{% load bootstrap3 %}
+{% block head %}
+<style>
+     /* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+} 
+.unstyled-button {
+    border: none;
+    background-color:  white;
+}
+</style>
+{% endblock %}
+{% block body_content %}
+    {% buttons %}
+    <button class="btn btn-primary" type="submit" id="file_button" name="new_file">
+        Přidat soubor
+    </button>
+    <button class="btn btn-primary" type="submit" id="folder_button" name="new_folder">
+        Nová složka
+    </button>
+    {% endbuttons %}
+    <div id="file_list">
+        {% for file in files %}
+        <form method="POST" action="{% url "crm_api:delete_file" pk=file.id %}">
+            {% csrf_token %}
+            <a href="{% url 'crm_api:download_file' file_id=file.id %}" target="_blank">{{ file.filename }}</a>
+            <button type="submit" class="unstyled-button" onclick="return confirm('Opravdu chcete smazat {{ file.filename }}?')">
+                {% bootstrap_icon 'glyphicon glyphicon-trash' %}
+            </button>
+        </form>
+        {% endfor %}
+    </div>
+    <div id="create_file" class="modal-window modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form action="" method="post" enctype="multipart/form-data">
+                <table style="color:black;text-align:left; margin-left: 20px;">
+                    {% csrf_token %}
+                    {{ form.as_table }}
+                </table>
+                {% buttons submit='Uložit' %}{% endbuttons %}
+            </form>
+        </div>
+    </div>
+    <div id="create_folder" class="modal-window modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form action="{% url 'crm_api:create_folder' cust_id=cust_id %}" method="post">
+                {% csrf_token %}
+                <input type="text" maxlength="200" name="folder_name" placeholder="Název složky" required><br>
+                <button class="btn btn-default" type="submit">
+                    Vytvořit
+                </button>
+            </form>
+        </div>        
+    </div>
+    <script type="text/javascript">
+        function setModals(modal, text, spanIdx)
+        {
+            var btn = document.getElementById(text + '_button');
+            var span = document.getElementsByClassName("close")[spanIdx];
+            btn.onclick = function() {
+                modal.style.display = "block";
+            }
+            span.onclick = function() {
+                modal.style.display = "none";
+            }
+        }
+        var modal_file = document.getElementById('create_file');
+        var modal_folder = document.getElementById('create_folder');
+        setModals(modal_file, 'file', 0);
+        setModals(modal_folder, 'folder', 1);
+        window.onclick = function(event) {
+            if (event.target == modal_file) {
+                modal_file.style.display = "none";
+            }
+            else if (event.target == modal_folder) {
+                modal_folder.style.display = "none";
+            }
+        }
+</script>
+{% endblock %}
