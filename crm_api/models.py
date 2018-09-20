@@ -1,11 +1,8 @@
 from django.db import models
 from filebrowser.fields import FileBrowseField
+from django.core.validators import RegexValidator
 import os
 # Create your models here.
-
-
-def customer_directory_path(instance, filename):
-    return os.path.normpath('user_{0}/{1}'.format(instance.customer.name, filename))
 
 
 class Customer(models.Model):    
@@ -42,7 +39,8 @@ class Customer(models.Model):
         ('radny', 'Řádný termín (1.4.)'),
         ('odlozeny', 'Odložený termín (1.7.)')
     ]
-    name = models.CharField(max_length=100, unique=True, verbose_name=CUSTOMER_LABELS['name'])
+    name = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['name'], 
+                            validators=[RegexValidator(r'^\w(\w|\s|\.|,)*$', 'Povoleny jsou pouze znaky a-ž A-Ž 0-9 . , a mezera')])
     address = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['address'])
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=CUSTOMER_LABELS['phone'])
     ico = models.CharField(max_length=20, blank=True, null=True, verbose_name=CUSTOMER_LABELS['ico'])
@@ -73,7 +71,7 @@ class Customer(models.Model):
 
 
 class CustomerFiles(models.Model):
-    files = models.FileField(upload_to=customer_directory_path)
+    files = models.FileField()
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='files')
 
     def filename(self):

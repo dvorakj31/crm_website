@@ -1,1 +1,16 @@
-<p>TODO</p>
+{% extends 'crm_api/html/_base.html' %}
+{% load bootstrap3 %}
+{% block body_content %}
+    <p>{{ file.count }}</p>
+    {% for file in files %}
+        <p>{{ file.filename }} -- {% if file.isdir %} isdir {% endif %}</p>
+    {% endfor %}
+    <form action="" method="post" enctype="multipart/form-data">
+        <table style="color:black;text-align:left; margin-left: 20px;">
+            {% csrf_token %}
+            {{ form.as_table }}
+        </table>
+        {% buttons submit='Uložit' %}{% endbuttons %}
+    </form>
+
+{% endblock %}

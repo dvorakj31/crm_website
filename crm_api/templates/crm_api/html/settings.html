@@ -1,6 +1,6 @@
 {% extends 'crm_api/html/_base.html' %}
 {% block body_content %}
-    <a href='{% url 'crm_api:change_password' %}' style="font-size: 30px;">Zmenit heslo</a><br>
+    <a href='{% url 'crm_api:change_password' %}' style="font-size: 30px;">Změnit heslo</a><br>
     {% if perms.crm_api.add_warningemail %}
         <a href='{% url 'crm_api:set_emails' %}' style="font-size: 30px;">Nastavit emaily</a><br>
     {% endif %}

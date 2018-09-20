@@ -8,17 +8,21 @@ from django.http import HttpResponseRedirect, HttpResponse, FileResponse
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django import forms
-from .models import Customer, WarningEmail, CustomerFiles, customer_directory_path
+from .models import Customer, WarningEmail, CustomerFiles
+from .forms import CustomerFilesForm
 from django.conf import settings
-import os
+import os, sys
 import mimetypes
 import re
 
 PAGE_NUM = 7
 
+# Auxiliary functions
+
+
 # Create your views here.
 
-class File:
+class CFile:
     
     def __init__(self, path):
         self.path = path
@@ -38,7 +42,7 @@ def edit_papers(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
     customer.papers = not customer.papers
     customer.save()
-    return HttpResponseRedirect('/crm')
+    return HttpResponseRedirect(reverse_lazy('crm_api:index'))
 
 
 @login_required
@@ -70,7 +74,7 @@ def change_password(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)  
-            return redirect('/crm')
+            return redirect(reverse_lazy('crm_api:index'))
     else:
         form = CustomPasswordChangeForm(request.user)
     return render(request, 'crm_api/html/change_password.html', {
@@ -106,7 +110,7 @@ def create_folder(request, cust_id):
 class CustomerSearchList(LoginRequiredMixin, generic.ListView):
     model = Customer
     template_name = 'crm_api/html/customer_search_result.html'
-    login_url = '/crm/login/'
+    login_url = '/login/'
     paginate_by = PAGE_NUM
 
     def get_queryset(self):
@@ -123,17 +127,25 @@ class CustomerSearchList(LoginRequiredMixin, generic.ListView):
 class CustomerList(LoginRequiredMixin, generic.ListView):
     model = Customer
     template_name = 'crm_api/html/index.html'
-    login_url = '/crm/login/'
+    login_url = '/login/'
     paginate_by = PAGE_NUM
 
 
 class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
     permission_required = 'crm_api.add_customer'
     model = Customer
-    success_url = '/crm/'
+    success_url = reverse_lazy('crm_api:index')
     fields = '__all__'
     template_name = 'crm_api/html/create_subject.html'
-    login_url = '/crm/login/'
+    login_url = '/login/'
+
+    def form_valid(self, form):
+        try:
+            os.mkdir(os.path.join(settings.MEDIA_ROOT, form.instance.name))
+        except:
+            messages.error(self.request, 'Chyba při vytváření klienta')
+            return redirect(reverse_lazy('crm_api:index'))
+        return super(CustomerCreateView, self).form_valid(form)
 
 
 class CustomerUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.UpdateView):
@@ -141,8 +153,8 @@ class CustomerUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.Update
     model = Customer
     template_name = 'crm_api/html/update_customer.html'
     fields = '__all__'
-    success_url = '/crm/'
-    login_url = '/crm/login/'
+    success_url = reverse_lazy('crm_api:index')
+    login_url = '/login/'
 
 
 class CustomerDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.DeleteView):
@@ -150,56 +162,73 @@ class CustomerDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.Delete
     model = Customer
     success_url = reverse_lazy('crm_api:index')
     fields = ['name']
-    login_url = '/crm/login/'
+    login_url = '/login/'
 
 
 # Customer file views starts here
-
 class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView):
     model = CustomerFiles
     fields = ['files']
     template_name = 'crm_api/html/file_list.html'
-    login_url = '/crm/login/'
-    paginate_by = PAGE_NUM
+    login_url = '/login/'
     context_object_name = 'files'
+
+    def _get_cust_dir(self):
+        # print('url:', self.request.get_full_path())
+        path_tmp = os.path.join(settings.MEDIA_ROOT, str(Customer.objects.get(pk=self.kwargs['cust_id'])))
+        cust_dir = path_tmp
+        if self.request.GET and 'dir' in self.request.GET:
+            cust_dir = os.path.normpath(os.path.join(cust_dir, self.request.GET['dir']))
+        if not cust_dir.startswith(path_tmp):
+            cust_dir = path_tmp
+        return cust_dir
+
+    def _file_path(self, filename):
+        try:
+            cust_dir = self._get_cust_dir()
+            file_path = os.path.normpath(os.path.join(cust_dir, filename))
+            print('file_path:', file_path)
+            if not file_path.startswith(cust_dir):
+                return cust_dir
+            return file_path
+        except:
+            print(sys.exc_info()[0])
+            return None
 
     def get_queryset(self):
         try:
-            file_obj = CustomerFiles.objects.filter(customer__id=self.kwargs['cust_id']).all()
-        except CustomerFiles.DoesNotExist:
-            file_obj = []
-        return file_obj
-
-    def get_context_data(self, **kwargs):
-        context = super(CustomerFilesList, self).get_context_data(**kwargs)
-        try:
-            context['name'] = Customer.objects.get(pk=self.kwargs['cust_id']).name
-        except Customer.DoesNotExist:
-            context['name'] = ''
-        context['object_list'] = CustomerFiles.objects.filter(customer__id=self.kwargs['cust_id']).all()
-        context['cust_id'] = self.kwargs['cust_id']
-        url_path = self.request.path.replace('/crm/list_files/', '')
-        file_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, url_path))
-        context['object_list'] = []
-        return context
+            cust_dir = self._get_cust_dir()
+            file_list = []
+            for x in os.listdir(cust_dir):
+                file_list.append(CFile(os.path.join(cust_dir, x)))
+            return file_list
+        except:
+            print(sys.exc_info()[0])
+            return []        
 
     def form_valid(self, form):
         try:
             form.instance.customer = Customer.objects.get(pk=self.kwargs['cust_id'])
+            print(form.instance.files, form.instance.files.path, os.path.exists(form.instance.files.path))
+
         except Customer.DoesNotExist:
             messages.error(self.request, 'Neplatný subjekt')
-            return redirect('/crm/add_file/%s' % self.kwargs['cust_id'])
+            return redirect(self.request.get_full_path())
         return super(CustomerFilesList, self).form_valid(form)
 
     def get_success_url(self, **kwargs):
-        return self.request.path
+        messages.success(self.request, 'Soubor úspěšně přidán')
+        if isinstance(self.object, CustomerFiles):
+            print(self.object.files.path)
+            os.rename(self.object.files.path, self._file_path(self.object.filename()))
+        return self.request.get_full_path()
 
 
 class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.DeleteView):
     permission_required = 'crm_api.delete_customerfiles'
     model = CustomerFiles
     fields = ['files']
-    login_url = '/crm/login/'
+    login_url = '/login/'
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -211,7 +240,7 @@ class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.D
         return super(CustomerFilesDelete, self).delete(request, args, kwargs)
 
     def get_success_url(self, **kwargs):
-        return '/crm/list_files/%d' % self.get_object().customer.id
+        return self.request.get_full_path()
     
 
 # Settings views starts here
@@ -234,10 +263,10 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 class WarningEmailCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
     permission_required = 'crm_api.add_warningemail'
     model = WarningEmail
-    success_url = '/crm/set_emails'
+    success_url = reverse_lazy('crm_api:set_emails')
     fields = '__all__'
     template_name = 'crm_api/html/create_email.html'
-    login_url = '/crm/login/'
+    login_url = '/login/'
 
 
 class WarningEmailUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.UpdateView):
@@ -245,8 +274,8 @@ class WarningEmailUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.Up
     model = WarningEmail
     template_name = 'crm_api/html/update_email.html'
     fields = '__all__'
-    success_url = '/crm/set_emails'
-    login_url = '/crm/login/'
+    success_url = reverse_lazy('crm_api:set_emails')
+    login_url = '/login/'
 
 
 class WarningEmailDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.DeleteView):
@@ -254,4 +283,4 @@ class WarningEmailDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.De
     model = WarningEmail
     success_url = reverse_lazy('crm_api:set_emails')
     fields = ['name']
-    login_url = '/crm/login/'
+    login_url = '/login/'

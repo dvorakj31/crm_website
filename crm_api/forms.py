@@ -7,19 +7,19 @@ class CustomerForm(forms.ModelForm):
         model = Customer
         exclude = ()
         labels = {
-            'name': 'Nazev spolecnosti',
+            'name': 'Název subjektu',
             'address': 'Adresa',
             'email': 'Email',
-            'ico': 'ICO',
-            'dic': 'DIC',
-            'hea_insurance': 'Zdravotni pojistovna',
-            'var_symbol': 'Variabilni symbol soc. poj.',
-            'soc_insurance': 'Socialni pojistovna',
-            'vat': 'Platce DPH',
-            'tax_office': 'Financni urad',
+            'ico': 'IČO',
+            'dic': 'DIČ',
+            'hea_insurance': 'Zdravotní pojišťovna',
+            'var_symbol': 'Variabilní symbol soc. poj.',
+            'soc_insurance': 'Sociální pojišťovna',
+            'vat': 'Plátce DPH',
+            'tax_office': 'Finanční úřad',
             'phone': 'Telefon',
-            'tax_type': 'Typ dane',
-            'tax_term': 'Termin dane'
+            'tax_type': 'Typ daně',
+            'tax_term': 'Termín daně'
         }
 
 
@@ -33,8 +33,8 @@ class WarningEmailForm(forms.ModelForm):
         model = WarningEmail
         exclude = ()
         label = {
-            'name': 'Nazev',
-            'subject': 'Predmet',
-            'body': 'Telo',
-            'email_type': 'Druh varovani',
+            'name': 'Název',
+            'subject': 'Předmět',
+            'body': 'Tělo',
+            'email_type': 'Druh varování',
         }
