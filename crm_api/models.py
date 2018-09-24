@@ -43,8 +43,8 @@ class Customer(models.Model):
                             validators=[RegexValidator(r'^\w(\w|\s|\.|,)*$', 'Povoleny jsou pouze znaky a-ž A-Ž 0-9 . , a mezera')])
     address = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['address'])
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=CUSTOMER_LABELS['phone'])
-    ico = models.CharField(max_length=20, blank=True, null=True, verbose_name=CUSTOMER_LABELS['ico'])
-    dic = models.CharField(max_length=20, blank=True, null=True, verbose_name=CUSTOMER_LABELS['dic'])
+    ico = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name=CUSTOMER_LABELS['ico'])
+    dic = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name=CUSTOMER_LABELS['dic'])
     email = models.EmailField(max_length=254, blank=True, null=True, verbose_name=CUSTOMER_LABELS['email'])
     tax_type = models.CharField(max_length=20, choices=TAX_TYPES, default='fo',
                                 verbose_name=CUSTOMER_LABELS['tax_type'])

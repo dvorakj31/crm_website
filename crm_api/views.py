@@ -18,6 +18,28 @@ import re
 PAGE_NUM = 7
 
 # Auxiliary functions
+def _get_cust_dir(cust_id, request):
+    cust = Customer.objects.get(pk=cust_id)
+    path_tmp = os.path.join(settings.MEDIA_ROOT, str(cust))
+    cust_dir = path_tmp
+    if request.GET and 'dir' in request.GET:
+        filename_add = cust.ico if cust.ico else str(cust.id)
+        cust_dir = os.path.normpath(os.path.join(cust_dir + '_' + filename_add, request.GET['dir']))
+        print('cust_dir =', cust_dir)
+    if not cust_dir.startswith(path_tmp):
+        cust_dir = path_tmp
+    return cust_dir
+
+def _file_path(cust_id, request, filename):
+    try:
+        cust_dir = _get_cust_dir(cust_id, request)
+        file_path = os.path.normpath(os.path.join(cust_dir, filename))
+        if not file_path.startswith(cust_dir):
+            return cust_dir
+        return file_path
+    except:
+        print(sys.exc_info()[0])
+        return None
 
 
 # Create your views here.
@@ -93,16 +115,17 @@ def set_emails(request):
 
 @login_required
 def create_folder(request, cust_id):
-    if request.method == 'POST':
-        print('folder name:', request.POST['folder_name'])
-        if request.POST['folder_name']:
-            try:
-                cust = Customer.objects.get(pk=cust_id)
-                folder_path = os.path.normpath(os.path.join('media/', 'user_{0}/{1}'.format(cust.name, request.POST['folder_name'])))
-                os.makedirs(folder_path, exist_ok=True)
-                messages.success(request, 'Adresář %s byl úspěšně vytvořen' % request.POST['folder_name'])
-            except (Customer.DoesNotExist, FileExistsError, PermissionError):
-                messages.error(request, 'Adresář nemohl být vytvořen')
+    if request.method == 'POST' and request.POST['folder_name']:
+        try:
+            if request.GET:
+                print('?dir=' + request.GET['dir'])
+            print('post:', request.POST['folder_name'])
+            folder_path = _file_path(cust_id, request, request.POST['folder_name'])
+            print('folder_path:', folder_path)
+            os.makedirs(folder_path)
+            messages.success(request, 'Adresář %s byl úspěšně vytvořen' % request.POST['folder_name'])
+        except:
+            messages.error(request, 'Adresář nemohl být vytvořen')
     return redirect(reverse_lazy('crm_api:list_files', kwargs={'cust_id': cust_id}))
 
 
@@ -173,31 +196,9 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
     login_url = '/login/'
     context_object_name = 'files'
 
-    def _get_cust_dir(self):
-        # print('url:', self.request.get_full_path())
-        path_tmp = os.path.join(settings.MEDIA_ROOT, str(Customer.objects.get(pk=self.kwargs['cust_id'])))
-        cust_dir = path_tmp
-        if self.request.GET and 'dir' in self.request.GET:
-            cust_dir = os.path.normpath(os.path.join(cust_dir, self.request.GET['dir']))
-        if not cust_dir.startswith(path_tmp):
-            cust_dir = path_tmp
-        return cust_dir
-
-    def _file_path(self, filename):
-        try:
-            cust_dir = self._get_cust_dir()
-            file_path = os.path.normpath(os.path.join(cust_dir, filename))
-            print('file_path:', file_path)
-            if not file_path.startswith(cust_dir):
-                return cust_dir
-            return file_path
-        except:
-            print(sys.exc_info()[0])
-            return None
-
     def get_queryset(self):
         try:
-            cust_dir = self._get_cust_dir()
+            cust_dir = _get_cust_dir(self.kwargs['cust_id'], self.request)
             file_list = []
             for x in os.listdir(cust_dir):
                 file_list.append(CFile(os.path.join(cust_dir, x)))
@@ -209,8 +210,6 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
     def form_valid(self, form):
         try:
             form.instance.customer = Customer.objects.get(pk=self.kwargs['cust_id'])
-            print(form.instance.files, form.instance.files.path, os.path.exists(form.instance.files.path))
-
         except Customer.DoesNotExist:
             messages.error(self.request, 'Neplatný subjekt')
             return redirect(self.request.get_full_path())
@@ -219,9 +218,17 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Soubor úspěšně přidán')
         if isinstance(self.object, CustomerFiles):
-            print(self.object.files.path)
-            os.rename(self.object.files.path, self._file_path(self.object.filename()))
+            os.rename(self.object.files.path, _file_path(self.kwargs['cust_id'], self.request, self.object.filename()))
         return self.request.get_full_path()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cust_id'] = self.kwargs['cust_id']
+        if self.request.GET and 'dir' in self.request.GET:
+            context['dir_param'] = self.request.GET['dir']
+        else:
+            context['dir_param'] = ''
+        return context
 
 
 class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.DeleteView):
