@@ -169,7 +169,7 @@ class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.Cr
         try:
             name_add = self.object.id
             path = os.path.join(settings.MEDIA_ROOT, str(self.object.name) + '_' + str(name_add))
-            os.mkdir(os.path.normpath(path))
+            os.makedirs(os.path.normpath(path))
         except:
             print(sys.exc_info()[0])
         return reverse_lazy('crm_api:index')
