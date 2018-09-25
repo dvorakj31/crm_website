@@ -4,13 +4,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponse, FileResponse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django import forms
 from .models import Customer, WarningEmail, CustomerFiles
 from .forms import CustomerFilesForm
 from django.conf import settings
+from wsgiref.util import FileWrapper
+
 import os, sys
 import mimetypes
 import re
@@ -18,14 +20,14 @@ import re
 PAGE_NUM = 7
 
 # Auxiliary functions
+
 def _get_cust_dir(cust_id, request):
     cust = Customer.objects.get(pk=cust_id)
-    path_tmp = os.path.join(settings.MEDIA_ROOT, str(cust))
+    filename_add = '_' + str(cust_id)
+    path_tmp = os.path.join(settings.MEDIA_ROOT, str(cust) + filename_add)
     cust_dir = path_tmp
     if request.GET and 'dir' in request.GET:
-        filename_add = cust.ico if cust.ico else str(cust.id)
-        cust_dir = os.path.normpath(os.path.join(cust_dir + '_' + filename_add, request.GET['dir']))
-        print('cust_dir =', cust_dir)
+        cust_dir = os.path.normpath(os.path.join(cust_dir, request.GET['dir']))
     if not cust_dir.startswith(path_tmp):
         cust_dir = path_tmp
     return cust_dir
@@ -46,14 +48,20 @@ def _file_path(cust_id, request, filename):
 
 class CFile:
     
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, path, file_id=None):
+        print('adding:', path, 'id =', file_id)
+        print('isdir =', os.path.isdir(path))
+        self._path = path
+        self._id = file_id
     
     def isdir(self):
-        return os.path.isdir(self.path)
+        return os.path.isdir(self._path)
 
     def filename(self):
-        return os.path.basename(self.path)
+        return os.path.basename(self._path)
+
+    def id(self):
+        return self._id
 
     def __lt__(self, other):
         return self.filename < other.filename
@@ -70,12 +78,11 @@ def edit_papers(request, cust_id):
 @login_required
 def download_file(request, file_id):
     cust_file = get_object_or_404(CustomerFiles, pk=file_id)
-    file_name = str(cust_file.files)
-    mime = mimetypes.guess_type(file_name)
-    if mime[0] is None:
-        mime = ('application/octet-stream', None)
-    response = FileResponse(cust_file.files, content_type='file/%s' % mime[0].split('/')[1])
-    response['Content-Disposition'] = "attachment;filename=%s" % file_name.split('/')[1]
+    file_name = cust_file.filename()
+    wrapper = FileWrapper(open(cust_file.file_path))
+    response = HttpResponse(wrapper, content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=%s' % file_name
+    response['Content-Length'] = os.path.getsize(cust_file.file_path)
     return response
 
 
@@ -117,16 +124,12 @@ def set_emails(request):
 def create_folder(request, cust_id):
     if request.method == 'POST' and request.POST['folder_name']:
         try:
-            if request.GET:
-                print('?dir=' + request.GET['dir'])
-            print('post:', request.POST['folder_name'])
             folder_path = _file_path(cust_id, request, request.POST['folder_name'])
-            print('folder_path:', folder_path)
             os.makedirs(folder_path)
             messages.success(request, 'Adresář %s byl úspěšně vytvořen' % request.POST['folder_name'])
         except:
             messages.error(request, 'Adresář nemohl být vytvořen')
-    return redirect(reverse_lazy('crm_api:list_files', kwargs={'cust_id': cust_id}))
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 # Customer views starts here
@@ -161,15 +164,15 @@ class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.Cr
     fields = '__all__'
     template_name = 'crm_api/html/create_subject.html'
     login_url = '/login/'
-
-    def form_valid(self, form):
+    
+    def get_success_url(self, **kwargs):
         try:
-            os.mkdir(os.path.join(settings.MEDIA_ROOT, form.instance.name))
+            name_add = self.object.id
+            path = os.path.join(settings.MEDIA_ROOT, str(self.object.name) + '_' + str(name_add))
+            os.mkdir(os.path.normpath(path))
         except:
-            messages.error(self.request, 'Chyba při vytváření klienta')
-            return redirect(reverse_lazy('crm_api:index'))
-        return super(CustomerCreateView, self).form_valid(form)
-
+            print(sys.exc_info()[0])
+        return reverse_lazy('crm_api:index')
 
 class CustomerUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.UpdateView):
     permission_required = 'crm_api.change_customer'
@@ -201,7 +204,12 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
             cust_dir = _get_cust_dir(self.kwargs['cust_id'], self.request)
             file_list = []
             for x in os.listdir(cust_dir):
-                file_list.append(CFile(os.path.join(cust_dir, x)))
+                file_path = os.path.join(cust_dir, x)
+                try:
+                    f_id = CustomerFiles.objects.get(customer__id=self.kwargs['cust_id'], file_path__exact=file_path).id
+                except:
+                    f_id = None
+                file_list.append(CFile(os.path.join(cust_dir, x), f_id))
             return file_list
         except:
             print(sys.exc_info()[0])
@@ -210,6 +218,8 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
     def form_valid(self, form):
         try:
             form.instance.customer = Customer.objects.get(pk=self.kwargs['cust_id'])
+            form.instance.file_path = _file_path(self.kwargs['cust_id'], self.request, str(form.instance))
+            print(str(form.instance.file_path))
         except Customer.DoesNotExist:
             messages.error(self.request, 'Neplatný subjekt')
             return redirect(self.request.get_full_path())
@@ -239,15 +249,15 @@ class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.D
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
-        print('trying to delete', os.path.join(settings.MEDIA_ROOT, str(obj.files)))
+        print('trying to delete', str(obj.file_path))
         try:
-            os.remove(os.path.join(settings.MEDIA_ROOT, str(obj.files)))
+            os.remove(os.path.join(str(obj.file_path)))
         except OSError:
             pass
         return super(CustomerFilesDelete, self).delete(request, args, kwargs)
 
     def get_success_url(self, **kwargs):
-        return self.request.get_full_path()
+        return self.request.META.get('HTTP_REFERER')
     
 
 # Settings views starts here
@@ -266,7 +276,7 @@ class CustomPasswordChangeForm(PasswordChangeForm):
                                     error_messages={'required': 'Vyplňte toto pole'})
 
 
-#Warning email views starts here
+# Warning email views starts here
 class WarningEmailCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
     permission_required = 'crm_api.add_warningemail'
     model = WarningEmail

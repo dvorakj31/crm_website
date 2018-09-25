@@ -55,21 +55,52 @@
     </button>
     {% endbuttons %}
     <div id="file_list">
-        {% for file in files %}
-        <form method="POST" action="">
-            {% csrf_token %}
-            {% comment %} <a href="{% url 'crm_api:download_file' file_id=file.id %}" target="_blank">{{ file.filename }}</a> {% endcomment %}
-            {% if file.isdir %}
-                <a href="?dir={% if dir_param %}{{ dir_param}}/{% endif %}{{ file.filename }}">{{ file.filename }}</a>
-            {% else %}
-                {{ file.filename }}
-            {% endif %}
-            
-            {% comment %} <button type="submit" class="unstyled-button" onclick="return confirm('Opravdu chcete smazat {{ file.filename }}?')">
-                {% bootstrap_icon 'glyphicon glyphicon-trash' %}
-            </button> {% endcomment %}
-        </form>
-        {% endfor %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Název
+                    </th>
+                    <th>
+                        Typ
+                    </th>
+                    <th>
+                        Akce
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                <form method="POST" action="{% if not file.isdir %} {% url 'crm_api:delete_file' pk=file.id %} {% else %} '' {% endif %}">
+                    {% csrf_token %}
+                    <tr>
+                    <td>
+                        {% if file.isdir %}
+                            <a href="?dir={% if dir_param %}{{ dir_param}}/{% endif %}{{ file.filename }}">{{ file.filename }}</a>
+                        {% else %}
+                            <a href="{% url 'crm_api:download_file' file_id=file.id %}" target="_blank">{{ file.filename }}</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if file.isdir %}
+                            Složka
+                        {% else %}
+                            Soubor
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not file.isdir %}
+                        <button title="Smazat" type="submit" class="unstyled-button" onclick="return confirm('Opravdu chcete smazat {{ file.filename }}?')">
+                            {% bootstrap_icon 'glyphicon glyphicon-trash' %}
+                        </button>
+                        {% endif %}
+                    </td>
+                    </tr>
+                {% endfor %}
+                </form>
+            </tbody>
+        
+        </table>
     </div>
     <div id="create_file" class="modal-window modal">
         <div class="modal-content">

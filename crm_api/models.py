@@ -73,12 +73,16 @@ class Customer(models.Model):
 class CustomerFiles(models.Model):
     files = models.FileField()
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='files')
+    file_path = models.CharField(max_length=255)
 
     def filename(self):
         return os.path.basename(self.files.name)
 
     def is_dir(self):
         return os.path.isdir(self.files.name)
+
+    def __str__(self):
+        return self.files.name
 
 
 class WarningEmail(models.Model):
