@@ -13,7 +13,7 @@ from .forms import CustomerFilesForm
 from django.conf import settings
 from wsgiref.util import FileWrapper
 
-import os, sys
+import os, sys, shutil
 import mimetypes
 import re
 
@@ -49,8 +49,6 @@ def _file_path(cust_id, request, filename):
 class CFile:
     
     def __init__(self, path, file_id=None):
-        print('adding:', path, 'id =', file_id)
-        print('isdir =', os.path.isdir(path))
         self._path = path
         self._id = file_id
     
@@ -62,6 +60,12 @@ class CFile:
 
     def id(self):
         return self._id
+
+    def file_path(self):
+        return self._path
+    
+    def media_path(self):
+        return os.path.relpath(self._path)
 
     def __lt__(self, other):
         return self.filename < other.filename
@@ -129,6 +133,12 @@ def create_folder(request, cust_id):
             messages.success(request, 'Adresář %s byl úspěšně vytvořen' % request.POST['folder_name'])
         except:
             messages.error(request, 'Adresář nemohl být vytvořen')
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def delete_folder(request, path):
+    shutil.rmtree(path)
     return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -223,7 +233,7 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
         except Customer.DoesNotExist:
             messages.error(self.request, 'Neplatný subjekt')
             return redirect(self.request.get_full_path())
-        return super(CustomerFilesList, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
         messages.success(self.request, 'Soubor úspěšně přidán')
@@ -254,7 +264,7 @@ class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.D
             os.remove(os.path.join(str(obj.file_path)))
         except OSError:
             pass
-        return super(CustomerFilesDelete, self).delete(request, args, kwargs)
+        return super().delete(request, args, kwargs)
 
     def get_success_url(self, **kwargs):
         return self.request.META.get('HTTP_REFERER')

@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^delete_file/(?P<pk>[0-9]+)/$', views.CustomerFilesDelete.as_view(), name='delete_file'),
     url(r'^download_file/(?P<file_id>[0-9]+)/$', views.download_file, name='download_file'),
     url(r'^create_folder/(?P<cust_id>[0-9]+)/$', views.create_folder, name='create_folder'),
+    url(r'^delete_folder/(?P<path>.*)/$', views.delete_folder, name='delete_folder'),
     url(r'^edit_papers/(?P<cust_id>[0-9]+)/$', views.edit_papers, name='edit_papers'),
     url(r'^settings/$', views.settings_view, name='settings'),
     url(r'^change_password/$', views.change_password, name='change_password'),

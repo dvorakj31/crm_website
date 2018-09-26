@@ -71,8 +71,6 @@
             </thead>
             <tbody>
                 {% for file in files %}
-                <form method="POST" action="{% if not file.isdir %} {% url 'crm_api:delete_file' pk=file.id %} {% else %} '' {% endif %}">
-                    {% csrf_token %}
                     <tr>
                     <td>
                         {% if file.isdir %}
@@ -89,17 +87,16 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if not file.isdir %}
-                        <button title="Smazat" type="submit" class="unstyled-button" onclick="return confirm('Opravdu chcete smazat {{ file.filename }}?')">
-                            {% bootstrap_icon 'glyphicon glyphicon-trash' %}
-                        </button>
-                        {% endif %}
+                        <form method="POST" action="{% if not file.isdir %} {% url 'crm_api:delete_file' pk=file.id %} {% else %} {% url 'crm_api:delete_folder' path=file.media_path%} {% endif %}">
+                            {% csrf_token %}
+                            <button title="Smazat" type="submit" class="unstyled-button" onclick="return confirm('Opravdu chcete smazat {{ file.filename }}{% if file.isdir%} a vše, co je v této složce {% endif %}?')">
+                                {% bootstrap_icon 'glyphicon glyphicon-trash' %}
+                            </button>
+                        </form>
                     </td>
                     </tr>
                 {% endfor %}
-                </form>
-            </tbody>
-        
+            </tbody>        
         </table>
     </div>
     <div id="create_file" class="modal-window modal">
