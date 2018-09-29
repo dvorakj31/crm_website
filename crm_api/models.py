@@ -1,5 +1,4 @@
 from django.db import models
-from filebrowser.fields import FileBrowseField
 from django.core.validators import RegexValidator
 import os
 # Create your models here.
