@@ -1,6 +1,7 @@
 {% extends 'crm_api/html/_create.html' %}
 {% block head %}
-{% include 'crm_api/js/customer_table.js' %}
+{% load staticfiles %}
+<script src="{% static 'customer_table.js' %}"></script>
 {% endblock %}
 {% block form_content %}
     <table style="color:black;text-align:left; margin-left: 20px;">

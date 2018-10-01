@@ -1,11 +1,24 @@
 {% extends 'crm_api/html/_search.html' %}
 {% load bootstrap3 %}
+{% block head %}
+{% load staticfiles %}
+<script src="{% static 'customer_search.js' %}"></script>
+{% endblock %}
 {% block search_content %}
     <p>Vyhledat s filtry</p>
     <form id="searchform" action="{% url 'crm_api:customer_search_result' %}" method="get" accept-charset="utf-8">
-        <p>Doklady:</p>
-        <input title="brought" type="radio" name="filter_papers" value="yes" checked> Přinesl<br>
-        <input title="not_brought" type="radio" name="filter_papers" value="no"> Nepřinesl
+        <input id="id_papers" type="checkbox">Doklady<br>
+        <div id="id_paper_filter">
+            <input title="brought" type="radio" name="filter_papers" value="yes" checked> Přinesl<br>
+            <input title="not_brought" type="radio" name="filter_papers" value="no"> Nepřinesl
+        </div>
+        <input id="id_tax_filter" type="checkbox"> Přiznání<br>
+        <div id="id_tax_sub_filter">
+            <input title="submitted" type="radio" name="filter_tax" value="yes" checked> Podané<br>
+            <input title="not_submitted" type="radio" name="filter_tax" value="no"> Nepodané<br>
+            {% comment %} <input title="month" type="radio" name="sub_date" value="month" checked> Tento měsíc<br>
+            <input title="quart" type="radio" name="sub_date" value="quart"> Tento kvartál<br> {% endcomment %}
+        </div>
         {% buttons submit='Vyhledat' %}{% endbuttons %}
     </form>
 {% endblock %}

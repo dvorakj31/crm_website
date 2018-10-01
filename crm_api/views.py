@@ -162,11 +162,14 @@ class CustomerSearchList(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         query_set = Customer.objects.all()
         search_query = self.request.GET.get('q', None)
-        search_filter = self.request.GET.get('filter_papers', None)
+        search_filter_p = self.request.GET.get('filter_papers', None)
+        search_filter_t = self.request.GET.get('filter_tax', None)
         if search_query is not None:
             query_set = Customer.objects.filter(name__contains='%s' % search_query)
-        if search_filter in ['yes', 'no']:
-            query_set = query_set.filter(papers__exact=search_filter == 'yes')
+        if search_filter_p in ['yes', 'no']:
+            query_set = query_set.filter(papers__exact=search_filter_p == 'yes')
+        if search_filter_t in ['yes', 'no']:
+            query_set = query_set.filter(submitted_tax__exact=search_filter_t == 'yes')
         return query_set
 
 

@@ -1,4 +1,3 @@
-<script>
 function set_vs() {
     if ($('#id_is_employer').is(':checked')) {
         $('#id_var_symbol_employees').show()
@@ -34,6 +33,4 @@ $(document).ready(function(){
             $('label[for="id_hea_insurance"]').show();
         }
     });
-
 })
-</script>
