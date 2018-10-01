@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^create_folder/(?P<cust_id>[0-9]+)/$', views.create_folder, name='create_folder'),
     url(r'^delete_folder/(?P<path>.*)/$', views.delete_folder, name='delete_folder'),
     url(r'^edit_papers/(?P<cust_id>[0-9]+)/$', views.edit_papers, name='edit_papers'),
+    url(r'^edit_tax_submit/(?P<cust_id>[0-9]+)/$', views.edit_tax_submit, name='edit_tax_submit'),
     url(r'^settings/$', views.settings_view, name='settings'),
     url(r'^change_password/$', views.change_password, name='change_password'),
     url(r'^set_emails/$', views.set_emails, name='set_emails'),

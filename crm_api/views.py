@@ -10,12 +10,14 @@ from django.views import generic
 from django import forms
 from .models import Customer, WarningEmail, CustomerFiles
 from .forms import CustomerFilesForm
+from .charts import TaxSubPieChart, PapersPieChart
 from django.conf import settings
 from wsgiref.util import FileWrapper
 
 import os, sys, shutil
 import mimetypes
 import re
+import datetime
 
 PAGE_NUM = 7
 
@@ -76,7 +78,15 @@ def edit_papers(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
     customer.papers = not customer.papers
     customer.save()
-    return HttpResponseRedirect(reverse_lazy('crm_api:index'))
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+def edit_tax_submit(request, cust_id):
+    customer = get_object_or_404(Customer, pk=cust_id)
+    customer.submitted_tax = not customer.submitted_tax
+    customer.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required
@@ -165,6 +175,13 @@ class CustomerList(LoginRequiredMixin, generic.ListView):
     template_name = 'crm_api/html/index.html'
     login_url = '/login/'
     paginate_by = PAGE_NUM
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['quart'] = datetime.date.today().month // 4 + 1
+        context['tax_pie_chart'] = TaxSubPieChart(width=128, height=128)
+        context['papers_pie_chart'] = PapersPieChart(width=128, height=128)
+        return context
 
 
 class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):

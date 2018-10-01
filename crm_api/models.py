@@ -24,7 +24,8 @@ class Customer(models.Model):
         'property_tax': 'Daň z nemovitosti',
         'moss': 'MOSS',
         'employer': 'Zaměstnavatel',
-        'var_symbol_employees': 'Variabilní symbol zaměstnanci'
+        'var_symbol_employees': 'Variabilní symbol zaměstnanci',
+        'sub_tax': 'Podané přiznání'
     }
     CHOICES_VAT = [
         ('mesicne', 'Mesíčně'),
@@ -64,6 +65,7 @@ class Customer(models.Model):
     is_employer = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['employer'])
     var_symbol_employees = models.CharField(max_length=100, blank=True, null=True,
                                             verbose_name=CUSTOMER_LABELS['var_symbol_employees'])
+    submitted_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['sub_tax'])
 
     def __str__(self):
         return self.name

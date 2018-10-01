@@ -1,5 +1,8 @@
 {% extends 'crm_api/html/_table_pagination.html' %}
 {% load bootstrap3 %}
+{% block head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.min.js"></script>
+{% endblock %}
 {% block table_head %}
 <thead>
     <tr><th>
@@ -8,8 +11,12 @@
         Adresa
     </th><th>
     </th><th>
-        Přinesl doklady
-    </th></tr>
+        Přinesl doklady DPH
+    </th>
+    <th>
+        Přiznání podáno
+    </th>
+</tr>
 </thead>
 {% endblock %}
 {% block table_body %}
@@ -30,22 +37,56 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.papers %}
-                    {% bootstrap_icon 'glyphicon glyphicon-ok' %}
-                {% else %}
-                    {% bootstrap_icon 'glyphicon glyphicon-remove' %}
-                {% endif %}
                 {% buttons button_type="link" button_class="btn-primary" %}
                     <a href="{% url 'crm_api:edit_papers' customer.id %}">
                     {% if customer.papers %}
+                    {% bootstrap_icon 'glyphicon glyphicon-ok' %}
                         Přinesl
                     {% else %}
+                    {% bootstrap_icon 'glyphicon glyphicon-remove' %}
                         Nepřinesl
                     {% endif %}
                     </a>
                 {% endbuttons %}
             </td>
+            <td>
+                {% if customer.vat == 'mesicne' %}
+                    <a href="{% url 'crm_api:edit_tax_submit' customer.id %}">
+                    {% if customer.submitted_tax %}
+                    {% bootstrap_icon 'glyphicon glyphicon-ok' %}
+                        Podáno 
+                    {% else %}
+                    {% bootstrap_icon 'glyphicon glyphicon-remove' %}
+                        Nepodáno
+                    {% endif %}
+                    </a>
+                     k {% now 'm/Y' %}
+                {% elif customer.vat == 'ctvrtletne' %}
+                <a href="{% url 'crm_api:edit_tax_submit' customer.id %}">
+                    {% if customer.submitted_tax %}
+                    {% bootstrap_icon 'glyphicon glyphicon-ok' %}
+                        Podáno 
+                    {% else %}
+                    {% bootstrap_icon 'glyphicon glyphicon-remove' %}
+                        Nepodáno
+                    {% endif %}
+                    </a>
+                        k {{ quart }}Q                        
+                {% else %}
+                    Není plátce DPH
+                {% endif %}
+            </td>
         </tr>
     {% endfor %}
 </tbody>
+{% endblock %}
+{% block extra_content %}
+<table style="width: 100%">
+    <td>
+        {{ tax_pie_chart.as_html }}
+    </td>
+    <td>
+        {{ papers_pie_chart.as_html }}
+    </td>
+</table>
 {% endblock %}
