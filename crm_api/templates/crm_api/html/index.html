@@ -1,7 +1,9 @@
 {% extends 'crm_api/html/_table_pagination.html' %}
 {% load bootstrap3 %}
 {% block head %}
+{% if tax_pie_char or papers_pie_chart %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.min.js"></script>
+{% endif %}
 {% endblock %}
 {% block table_head %}
 <thead>
@@ -81,6 +83,7 @@
 </tbody>
 {% endblock %}
 {% block extra_content %}
+{% if tax_pie_char or papers_pie_chart %}
 <table style="width: 100%">
     <td>
         {{ tax_pie_chart.as_html }}
@@ -89,4 +92,5 @@
         {{ papers_pie_chart.as_html }}
     </td>
 </table>
+{% endif %}
 {% endblock %}

@@ -73,7 +73,7 @@ class CFile:
         return self.filename < other.filename
         
 
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 def edit_papers(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
     customer.papers = not customer.papers
@@ -81,7 +81,7 @@ def edit_papers(request, cust_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 def edit_tax_submit(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
     customer.submitted_tax = not customer.submitted_tax
@@ -89,7 +89,7 @@ def edit_tax_submit(request, cust_id):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 def download_file(request, file_id):
     cust_file = get_object_or_404(CustomerFiles, pk=file_id)
     file_name = cust_file.filename()
@@ -100,17 +100,12 @@ def download_file(request, file_id):
     return response
 
 
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 def select_customer(request):
     return render(request, 'crm_api/html/search_page.html')
 
 
-@login_required
-def settings_view(request):
-    return render(request, 'crm_api/html/settings.html')
-
-
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 def change_password(request):
     if request.method == 'POST':
         form = CustomPasswordChangeForm(request.user, request.POST)
@@ -125,7 +120,7 @@ def change_password(request):
     })
 
 
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 @permission_required('crm_api.add_warningemail')
 def set_emails(request):
     if request.method == 'POST':
@@ -134,7 +129,7 @@ def set_emails(request):
     return render(request, 'crm_api/html/set_emails.html', {'object_list': WarningEmail.objects.values()})
 
 
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 def create_folder(request, cust_id):
     if request.method == 'POST' and request.POST['folder_name']:
         try:
@@ -146,33 +141,13 @@ def create_folder(request, cust_id):
     return redirect(request.META.get('HTTP_REFERER'))
 
 
-@login_required
+@login_required(login_url=reverse_lazy('crm_api:login'))
 def delete_folder(request, path):
     shutil.rmtree(path)
     return redirect(request.META.get('HTTP_REFERER'))
 
 
 # Customer views starts here
-class CustomerSearchList(LoginRequiredMixin, generic.ListView):
-    model = Customer
-    template_name = 'crm_api/html/customer_search_result.html'
-    login_url = '/login/'
-    paginate_by = PAGE_NUM
-
-    def get_queryset(self):
-        query_set = Customer.objects.all()
-        search_query = self.request.GET.get('q', None)
-        search_filter_p = self.request.GET.get('filter_papers', None)
-        search_filter_t = self.request.GET.get('filter_tax', None)
-        if search_query is not None:
-            query_set = Customer.objects.filter(name__contains='%s' % search_query)
-        if search_filter_p in ['yes', 'no']:
-            query_set = query_set.filter(papers__exact=search_filter_p == 'yes')
-        if search_filter_t in ['yes', 'no']:
-            query_set = query_set.filter(submitted_tax__exact=search_filter_t == 'yes')
-        return query_set
-
-
 class CustomerList(LoginRequiredMixin, generic.ListView):
     model = Customer
     template_name = 'crm_api/html/index.html'
@@ -182,9 +157,25 @@ class CustomerList(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['quart'] = datetime.date.today().month // 4 + 1
-        context['tax_pie_chart'] = TaxSubPieChart(width=128, height=128)
-        context['papers_pie_chart'] = PapersPieChart(width=128, height=128)
+        if Customer.objects.filter(vat__in=['ctvrtletne', 'mesicne']).count() > 0:
+            context['tax_pie_chart'] = TaxSubPieChart(width=128, height=128)
+        if Customer.objects.count() > 0:
+            context['papers_pie_chart'] = PapersPieChart(width=128, height=128)
         return context
+
+    def get_queryset(self):
+        query_set = super().get_queryset()
+        if self.request.GET:
+            search_query = self.request.GET.get('q', None)
+            search_filter_p = self.request.GET.get('filter_papers', None)
+            search_filter_t = self.request.GET.get('filter_tax', None)
+            if search_query is not None:
+                query_set = query_set.filter(name__contains='%s' % search_query)
+            if search_filter_p in ['yes', 'no']:
+                query_set = query_set.filter(papers__exact=search_filter_p == 'yes')
+            if search_filter_t in ['yes', 'no']:
+                query_set = query_set.filter(vat__in=['ctvrtletne', 'mesicne'], submitted_tax__exact=search_filter_t == 'yes')
+        return query_set
 
 
 class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.CreateView):
