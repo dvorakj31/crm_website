@@ -19,6 +19,18 @@ import mimetypes
 import re
 import datetime
 
+from django.core.mail import send_mail
+
+
+def email_sender():
+    send_mail(
+        'Subject here',
+        'Here is the message.',
+        'from@example.com',
+        ['to@example.com'],
+        fail_silently=False,
+    )
+
 PAGE_NUM = 7
 
 # Auxiliary functions
@@ -143,6 +155,9 @@ def create_folder(request, cust_id):
 
 @login_required(login_url=reverse_lazy('crm_api:login'))
 def delete_folder(request, path):
+    print(os.path.normpath(path))
+    if not os.path.normpath(path).startswith('media/'):
+        return redirect(request.META.get['HTTP_REFERER'])
     shutil.rmtree(path)
     return redirect(request.META.get('HTTP_REFERER'))
 
