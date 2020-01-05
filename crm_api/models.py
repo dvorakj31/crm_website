@@ -12,20 +12,26 @@ class Customer(models.Model):
         'dic': 'DIČ',
         'email': 'Email',
         'tax_type': 'Právní subjekt',
-        'tax_term': 'Termín plátce',
+        'tax_term': 'Termín podání přiznání - daň z příjmu',
         'vat': 'DPH',
         'tax_office': 'Finanční úřad',
         'soc_insurance': 'Sociální pojišťovna',
         'var_symbol': 'Variabilní symbol sociálního pojištění',
         'hea_insurance': 'Zdravotní pojišťovna',
         'phone': 'Telefon',
-        'papers': 'Přinesl Doklady',
+        'papers': 'Přinesl doklady k DPH',
+        'wage': 'Mzdové podklady',
         'road_tax': 'Silniční daň',
+        'road_tax_papers': 'Přinesl doklady k silniční dani',
+        'advance_tax': 'Zpracovaná zálohová daň',
+        'withholding_tax': 'Zpracovaná srážková daň',
         'property_tax': 'Daň z nemovitosti',
         'moss': 'MOSS',
         'employer': 'Zaměstnavatel',
         'var_symbol_employees': 'Variabilní symbol zaměstnanci',
-        'sub_tax': 'Podané přiznání'
+        'sub_tax': 'Podané přiznání DPH',
+        'sub_road_tax': 'Podané přiznání silniční daně',
+        'sub_wage': 'Zpracované mzdy',
     }
     CHOICES_VAT = [
         ('mesicne', 'Mesíčně'),
@@ -39,8 +45,10 @@ class Customer(models.Model):
         ('radny', 'Řádný termín (1.4.)'),
         ('odlozeny', 'Odložený termín (1.7.)')
     ]
+
     name = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['name'], 
-                            validators=[RegexValidator(r'^\w(\w|\s|\.|,)*$', 'Povoleny jsou pouze znaky a-ž A-Ž 0-9 . , a mezera')])
+                            validators=[RegexValidator(r'^\w(\w|\s|\.|,)*$',
+                                                       'Povoleny jsou pouze znaky a-ž A-Ž 0-9 . , a mezera')])
     address = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['address'])
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=CUSTOMER_LABELS['phone'])
     ico = models.CharField(max_length=20, unique=True, blank=True, null=True, verbose_name=CUSTOMER_LABELS['ico'])
@@ -59,13 +67,18 @@ class Customer(models.Model):
     hea_insurance = models.CharField(max_length=254, blank=True, null=True,
                                      verbose_name=CUSTOMER_LABELS['hea_insurance'])
     papers = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['papers'])
-    road_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['road_tax'])
+    wage = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['wage'])
+    road_tax_papers = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['road_tax_papers'])
+    advance_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['advance_tax'])
+    withholding_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['withholding_tax'])
     property_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['property_tax'])
     moss = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['moss'])
     is_employer = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['employer'])
     var_symbol_employees = models.CharField(max_length=100, blank=True, null=True,
                                             verbose_name=CUSTOMER_LABELS['var_symbol_employees'])
     submitted_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['sub_tax'])
+    submitted_road_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['sub_road_tax'])
+    submitted_wage_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['sub_wage'])
 
     def __str__(self):
         return self.name

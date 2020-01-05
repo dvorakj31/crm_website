@@ -9,14 +9,13 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django import forms
 from .models import Customer, WarningEmail, CustomerFiles
-from .forms import CustomerFilesForm
 from .charts import TaxSubPieChart, PapersPieChart
 from django.conf import settings
 from wsgiref.util import FileWrapper
 
-import os, sys, shutil
-import mimetypes
-import re
+import os
+import sys
+import shutil
 import datetime
 
 from django.core.mail import send_mail
@@ -31,9 +30,11 @@ def email_sender():
         fail_silently=False,
     )
 
+
 PAGE_NUM = 7
 
 # Auxiliary functions
+
 
 def _get_cust_dir(cust_id, request):
     cust = Customer.objects.get(pk=cust_id)
@@ -41,10 +42,11 @@ def _get_cust_dir(cust_id, request):
     path_tmp = os.path.join(settings.MEDIA_ROOT, str(cust) + filename_add)
     cust_dir = path_tmp
     if request.GET and 'dir' in request.GET:
-        cust_dir = os.path.normpath(os.path.join(cust_dir, request.GET['dir']))
+        cust_dir = os.path.normpath(os.path.join(cust_dir, str(request.GET['dir']).replace('/', '\\')))
     if not cust_dir.startswith(path_tmp):
         cust_dir = path_tmp
     return cust_dir
+
 
 def _file_path(cust_id, request, filename):
     try:
@@ -97,6 +99,14 @@ def edit_papers(request, cust_id):
 def edit_tax_submit(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
     customer.submitted_tax = not customer.submitted_tax
+    customer.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url=reverse_lazy('crm_api:login'))
+def edit_road_tax_submit(request, cust_id):
+    customer = get_object_or_404(Customer, pk=cust_id)
+    customer.submitted_road_tax = not customer.submitted_road_tax
     customer.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -181,15 +191,16 @@ class CustomerList(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         query_set = super().get_queryset()
         if self.request.GET:
-            search_query = self.request.GET.get('q', None)
-            search_filter_p = self.request.GET.get('filter_papers', None)
-            search_filter_t = self.request.GET.get('filter_tax', None)
+            search_query = self.request.GET.get('name', None)
+            search_filter_p = self.request.GET.get('papers', None)
+            search_filter_t = self.request.GET.get('sub_tax', None)
             if search_query is not None:
-                query_set = query_set.filter(name__contains='%s' % search_query)
-            if search_filter_p in ['yes', 'no']:
-                query_set = query_set.filter(papers__exact=search_filter_p == 'yes')
-            if search_filter_t in ['yes', 'no']:
-                query_set = query_set.filter(vat__in=['ctvrtletne', 'mesicne'], submitted_tax__exact=search_filter_t == 'yes')
+                query_set = query_set.filter(name__contains=f'{search_query}')
+            if search_filter_p in ['true', 'false']:
+                query_set = query_set.filter(papers__exact=search_filter_p == 'true')
+            if search_filter_t in ['true', 'false']:
+                query_set = query_set.filter(vat__in=['ctvrtletne', 'mesicne'],
+                                             submitted_tax__exact=search_filter_t == 'true')
         return query_set
 
 
@@ -209,6 +220,7 @@ class CustomerCreateView(PermissionRequiredMixin, LoginRequiredMixin, generic.Cr
         except:
             print(sys.exc_info()[0])
         return reverse_lazy('crm_api:index')
+
 
 class CustomerUpdate(PermissionRequiredMixin, LoginRequiredMixin, generic.UpdateView):
     permission_required = 'crm_api.change_customer'
@@ -239,6 +251,7 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
         try:
             cust_dir = _get_cust_dir(self.kwargs['cust_id'], self.request)
             file_list = []
+            print(f'custdir: {cust_dir}')
             for x in os.listdir(cust_dir):
                 file_path = os.path.join(cust_dir, x)
                 try:
@@ -248,6 +261,7 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
                 file_list.append(CFile(os.path.join(cust_dir, x), f_id))
             return file_list
         except:
+            print(file_list)
             print(sys.exc_info()[0])
             return []        
 

@@ -1,12 +1,13 @@
 from jchart import Chart
-from jchart.config import DataSet
 from .models import Customer
+
 
 class TaxSubPieChart(Chart):
     chart_type = 'pie'
     responsive = False
 
     def get_datasets(self, **kwargs):
+        print(f'{kwargs}')
         tax_pay = Customer.objects.filter(vat__in=['ctvrtletne', 'mesicne'])
         submitted = tax_pay.filter(submitted_tax=True)
         return [{

@@ -1,13 +1,15 @@
 {% extends 'crm_api/html/create_subject.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
+{% load staticfiles %}
+<script src="{% static 'customer_table.js' %}"></script>
 {% block content %}
     <form method="POST" action="{% url "crm_api:delete_customer" pk=customer.id %}">
         {% csrf_token %}
         {% buttons %}
-        <button class="btn btn-default" type="submit" onclick="return confirm('Opravdu chcete smazat {{ customer.name }}?')">
+        <button class="btn btn-primary" type="submit" onclick="return confirm('Opravdu chcete smazat {{ customer.name }}?')">
             Smazat
         </button>
         {% endbuttons %}
     </form>
-    <a href="{% url 'crm_api:list_files' cust_id=customer.id %}" style="font-size: 30px;">Soubory klienta</a><br>
+    <a class="btn btn-primary" href="{% url 'crm_api:list_files' cust_id=customer.id %}">Soubory klienta</a><br>
 {% endblock %}

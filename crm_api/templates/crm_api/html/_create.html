@@ -1,11 +1,11 @@
 {% extends 'crm_api/html/_base.html' %}
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 {% block body_content %}
 {% if form %}
-    <form action="" method="post" enctype="multipart/form-data">
+    <form style="display: inline" action="" method="post" enctype="multipart/form-data">
         {% block form_content %}
         {% endblock %}
-        {% buttons submit='Ulozit' %}{% endbuttons %}
+        {% buttons submit='Uložit' %}{% endbuttons %}
     </form>
 {% endif %}
     {% block content %}{% endblock %}
