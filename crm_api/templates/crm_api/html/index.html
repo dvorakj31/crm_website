@@ -1,13 +1,11 @@
 {% extends 'crm_api/html/_table_pagination.html' %}
 {% load bootstrap4 %}
+{% load date_extras %}
 {% block head %}
 {% if tax_pie_char or papers_pie_chart %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.min.js"></script>
 {% endif %}
 {% endblock %}
-{% if filter %}
-    <p>asi filter</p>
-{% endif %}
 {% block table_head %}
 <thead>
     <tr>
@@ -40,7 +38,7 @@
 {% endblock %}
 {% block table_body %}
 <tbody>
-    {% for customer in object_list %}
+    {% for customer in customer_list %}
         <tr>
             <td>
                 {% if perms.crm_api.change_customer %}
@@ -51,56 +49,55 @@
             </td>
             <td>
                 {% if customer.is_employer %}
-                <a href="{% url 'crm_api:edit_road_tax_submit' customer.id %}">
-                {% if customer.wage %}
-                    <span class="fa fa-check">Přinesl</span>
-                {% else %}
-                    <span class="fa fa-times">Nepřinesl</span>
-                {% endif %}
-                </a>
-                k {% now 'm/Y' %}
-                {% else %}
-                    -
+                    <a href="{% url 'crm_api:edit_wage' customer.id %}">
+                    {% if customer.wage %}
+                        <span class="fa fa-check">Přinesl</span>
+                    {% else %}
+                        <span class="fa fa-times">Nepřinesl</span>
+                    {% endif %}
+                    </a>
+                    k {% last_month True %}
+                    {% else %}
+                        -
                 {% endif %}
             </td>
             <td>
                 {% if customer.is_employer %}
-                <a href="{% url 'crm_api:edit_road_tax_submit' customer.id %}">
+                <a href="{% url 'crm_api:edit_sub_wage' customer.id %}">
                 {% if customer.submitted_wage_tax %}
                     <span class="fa fa-check">Zpracované</span>
                 {% else %}
                     <span class="fa fa-times">Nezpracované</span>
                 {% endif %}
                 </a>
-                 k {% now 'm/Y' %}
+                 k {% last_month True %}
                 {% else %}
                     -
                 {% endif %}
             </td>
             <td>
                 {% if customer.is_employer %}
-                    <a href="{% url 'crm_api:edit_road_tax_submit' customer.id %}">
+                    <a href="{% url 'crm_api:edit_advance_tax' customer.id %}">
                     {% if customer.advance_tax %}
                         <span class="fa fa-check">Zpracované</span>
                     {% else %}
                         <span class="fa fa-times">Nezpracované</span>
                     {% endif %}
                     </a>
-                     za rok {% now 'Y' %}
                 {% else %}
                     -
                 {% endif %}
             </td>
             <td>
                 {% if customer.is_employer %}
-                    <a href="{% url 'crm_api:edit_road_tax_submit' customer.id %}">
+                    <a href="{% url 'crm_api:edit_withholding_tax' customer.id %}">
                     {% if customer.withholding_tax %}
                         <span class="fa fa-check">Zpracované</span>
                     {% else %}
                         <span class="fa fa-times">Nezpracované</span>
                     {% endif %}
                     </a>
-                     za rok {% now 'Y' %}
+                     za rok {% last_year %}
                 {% else %}
                     -
                 {% endif %}
@@ -138,20 +135,22 @@
                         <span class="fa fa-times">Nepodáno</span>
                     {% endif %}
                     </a>
-                        k {{ quart }}Q                        
+                        k {% get_quartal %}Q
                 {% else %}
                     Není plátce DPH
                 {% endif %}
             </td>
             <td>
-                <a href="{% url 'crm_api:edit_road_tax_submit' customer.id %}">
-                {% if customer.submitted_road_tax %}
-                    <span class="fa fa-check">Podáno</span>
-                {% else %}
-                    <span class="fa fa-times">Nepodáno</span>
+                {% if customer.road_tax %}
+                    <a href="{% url 'crm_api:edit_road_tax_submit' customer.id %}">
+                    {% if customer.submitted_road_tax %}
+                        <span class="fa fa-check">Podáno</span>
+                    {% else %}
+                        <span class="fa fa-times">Nepodáno</span>
+                    {% endif %}
+                    </a>
+                     k {% last_year %}
                 {% endif %}
-                </a>
-                 k {% now 'm/Y' %}
             </td>
         </tr>
     {% endfor %}

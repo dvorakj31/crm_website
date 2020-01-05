@@ -21,8 +21,7 @@ class Customer(models.Model):
         'phone': 'Telefon',
         'papers': 'Přinesl doklady k DPH',
         'wage': 'Mzdové podklady',
-        'road_tax': 'Silniční daň',
-        'road_tax_papers': 'Přinesl doklady k silniční dani',
+        'road_tax': 'Plátce silniční daně',
         'advance_tax': 'Zpracovaná zálohová daň',
         'withholding_tax': 'Zpracovaná srážková daň',
         'property_tax': 'Daň z nemovitosti',
@@ -34,6 +33,7 @@ class Customer(models.Model):
         'sub_wage': 'Zpracované mzdy',
     }
     CHOICES_VAT = [
+        ('neplatce', 'Neplátce'),
         ('mesicne', 'Mesíčně'),
         ('ctvrtletne', 'Čtvrtletně')
     ]
@@ -44,6 +44,10 @@ class Customer(models.Model):
     TAX_TERMS = [
         ('radny', 'Řádný termín (1.4.)'),
         ('odlozeny', 'Odložený termín (1.7.)')
+    ]
+    PAPERS_TYPES = [
+        (True, 'Přinesl'),
+        (False, 'Nepřinesl'),
     ]
 
     name = models.CharField(max_length=100, verbose_name=CUSTOMER_LABELS['name'], 
@@ -58,7 +62,7 @@ class Customer(models.Model):
                                 verbose_name=CUSTOMER_LABELS['tax_type'])
     tax_term = models.CharField(max_length=25, choices=TAX_TERMS, null=True, default='radny',
                                 verbose_name=CUSTOMER_LABELS['tax_term'])
-    vat = models.CharField(max_length=20, choices=CHOICES_VAT, null=True, blank=True,
+    vat = models.CharField(max_length=20, choices=CHOICES_VAT, default='neplatce',
                            verbose_name=CUSTOMER_LABELS['vat'])
     tax_office = models.CharField(max_length=254, blank=True, null=True, verbose_name=CUSTOMER_LABELS['tax_office'])
     soc_insurance = models.CharField(max_length=254, blank=True, null=True,
@@ -66,12 +70,12 @@ class Customer(models.Model):
     var_symbol = models.CharField(max_length=100, blank=True, null=True, verbose_name=CUSTOMER_LABELS['var_symbol'])
     hea_insurance = models.CharField(max_length=254, blank=True, null=True,
                                      verbose_name=CUSTOMER_LABELS['hea_insurance'])
-    papers = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['papers'])
+    papers = models.BooleanField(null=True, blank=True, verbose_name=CUSTOMER_LABELS['papers'], choices=PAPERS_TYPES)
     wage = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['wage'])
-    road_tax_papers = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['road_tax_papers'])
     advance_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['advance_tax'])
     withholding_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['withholding_tax'])
     property_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['property_tax'])
+    road_tax = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['road_tax'])
     moss = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['moss'])
     is_employer = models.BooleanField(default=False, verbose_name=CUSTOMER_LABELS['employer'])
     var_symbol_employees = models.CharField(max_length=100, blank=True, null=True,

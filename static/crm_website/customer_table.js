@@ -32,9 +32,25 @@ function set_insurance() {
     }
 }
 
+function set_vat() {
+    let val = $('#id_vat').val();
+    if(val === 'mesicne' || val === 'ctvrtletne')
+    {
+        $('label[for="id_papers"]').show();
+        $('#id_papers').show();
+    }
+    else
+    {
+        $('label[for="id_papers"]').hide();
+        $('#id_papers').hide();
+    }
+}
+
 $(document).ready(function(){
     set_vs();
     set_insurance();
+    set_vat();
     $('#id_is_employer').click(set_vs);
     $('#id_tax_type').change(set_insurance);
+    $('#id_vat').change(set_vat);
 });

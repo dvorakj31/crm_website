@@ -12,6 +12,7 @@ from .models import Customer, WarningEmail, CustomerFiles
 from .charts import TaxSubPieChart, PapersPieChart
 from django.conf import settings
 from wsgiref.util import FileWrapper
+from .filters import CustomerFilter
 
 import os
 import sys
@@ -91,6 +92,38 @@ class CFile:
 def edit_papers(request, cust_id):
     customer = get_object_or_404(Customer, pk=cust_id)
     customer.papers = not customer.papers
+    customer.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url=reverse_lazy('crm_api:login'))
+def edit_wage(request, cust_id):
+    customer = get_object_or_404(Customer, pk=cust_id)
+    customer.wage = not customer.wage
+    customer.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url=reverse_lazy('crm_api:login'))
+def edit_sub_wage(request, cust_id):
+    customer = get_object_or_404(Customer, pk=cust_id)
+    customer.submitted_wage_tax = not customer.submitted_wage_tax
+    customer.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url=reverse_lazy('crm_api:login'))
+def edit_advancetax(request, cust_id):
+    customer = get_object_or_404(Customer, pk=cust_id)
+    customer.advance_tax = not customer.advance_tax
+    customer.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url=reverse_lazy('crm_api:login'))
+def edit_withholding(request, cust_id):
+    customer = get_object_or_404(Customer, pk=cust_id)
+    customer.withholding_tax = not customer.withholding_tax
     customer.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -181,7 +214,6 @@ class CustomerList(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['quart'] = datetime.date.today().month // 4 + 1
         if Customer.objects.filter(vat__in=['ctvrtletne', 'mesicne']).count() > 0:
             context['tax_pie_chart'] = TaxSubPieChart(width=128, height=128)
         if Customer.objects.count() > 0:
@@ -191,16 +223,7 @@ class CustomerList(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         query_set = super().get_queryset()
         if self.request.GET:
-            search_query = self.request.GET.get('name', None)
-            search_filter_p = self.request.GET.get('papers', None)
-            search_filter_t = self.request.GET.get('sub_tax', None)
-            if search_query is not None:
-                query_set = query_set.filter(name__contains=f'{search_query}')
-            if search_filter_p in ['true', 'false']:
-                query_set = query_set.filter(papers__exact=search_filter_p == 'true')
-            if search_filter_t in ['true', 'false']:
-                query_set = query_set.filter(vat__in=['ctvrtletne', 'mesicne'],
-                                             submitted_tax__exact=search_filter_t == 'true')
+            query_set = CustomerFilter(self.request.GET, queryset=Customer.objects.all()).qs
         return query_set
 
 

@@ -1,7 +1,7 @@
 {% extends "crm_api/html/_search.html" %}
 {% load bootstrap4 %}
 {% block search_content %}
-    <form id="searchform" action="{% url 'crm_api:customer_search_result' %}" method="get" accept-charset="utf-8">
+    <form action="{% url 'crm_api:customer_search_result' %}" method="get" accept-charset="utf-8">
         <table style="color:black;text-align:left; margin-left: 20px;">
             {{ filter.form.as_table }}
         </table>

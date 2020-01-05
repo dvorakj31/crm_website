@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'jchart',
     'django_filters',
+    'crm_api.templatetags.date_extras',
 ]
 
 MIDDLEWARE = [
