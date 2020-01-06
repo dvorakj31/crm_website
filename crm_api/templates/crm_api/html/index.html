@@ -118,24 +118,19 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.vat == 'mesicne' %}
-                    <a href="{% url 'crm_api:edit_tax_submit' customer.id %}">
-                    {% if customer.submitted_tax %}
-                        <span class="fa fa-check">Podáno</span>
-                    {% else %}
-                        <span class="fa fa-times">Nepodáno</span>
-                    {% endif %}
-                    </a>
-                     k {% now 'm/Y' %}
-                {% elif customer.vat == 'ctvrtletne' %}
+                {% if customer.vat != 'neplatce' %}
                 <a href="{% url 'crm_api:edit_tax_submit' customer.id %}">
                     {% if customer.submitted_tax %}
                         <span class="fa fa-check">Podáno</span>
                     {% else %}
                         <span class="fa fa-times">Nepodáno</span>
                     {% endif %}
-                    </a>
-                        k {% get_quartal %}Q
+                </a>
+                {% endif %}
+                {% if customer.vat == 'mesicne' %}
+                    za {% last_month True %}
+                {% elif customer.vat == 'ctvrtletne' %}
+                    za {% get_quartal %}. Q
                 {% else %}
                     Není plátce DPH
                 {% endif %}

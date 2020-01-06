@@ -4,7 +4,7 @@ from .models import Customer
 
 
 EMPTY_CHOICE = ('', '--------')
-PAPERS_CHOICES = (EMPTY_CHOICE, (True, 'Nepřinesl'), (True, 'Přinesl'))
+PAPERS_CHOICES = (EMPTY_CHOICE, (False, 'Nepřinesl'), (True, 'Přinesl'))
 TAX_CHOICES = (EMPTY_CHOICE, ('mesicne', 'Měsíčně'), ('ctvrtletne', 'Čtvrtletně'))
 ROAD_TAX_CHOICES = (EMPTY_CHOICE, (True, 'Plátce'), (False, 'Neplátce'))
 

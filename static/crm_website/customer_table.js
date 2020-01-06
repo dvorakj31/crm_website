@@ -34,15 +34,18 @@ function set_insurance() {
 
 function set_vat() {
     let val = $('#id_vat').val();
+    let papers = $('#id_papers');
     if(val === 'mesicne' || val === 'ctvrtletne')
     {
         $('label[for="id_papers"]').show();
-        $('#id_papers').show();
+        papers.show();
+        papers.val("False")
     }
     else
     {
         $('label[for="id_papers"]').hide();
-        $('#id_papers').hide();
+        papers.hide();
+        papers.val("")
     }
 }
 

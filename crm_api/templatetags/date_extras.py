@@ -1,5 +1,7 @@
 from django import template
 import datetime
+import math
+
 register = template.Library()
 
 
@@ -21,4 +23,4 @@ def last_month(with_year=False):
 
 @register.simple_tag
 def get_quartal():
-    return str(datetime.datetime.now().month // 4 + 1)
+    return str(math.ceil(datetime.datetime.now().month / 3))

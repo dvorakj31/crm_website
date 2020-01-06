@@ -26,7 +26,7 @@ class PapersPieChart(Chart):
     responsive = False
 
     def get_datasets(self, **kwargs):
-        all_customers_cnt = len(Customer.objects.all())
+        all_customers_cnt = len(Customer.objects.filter(papers__isnull=False))
         papers_cnt = len(Customer.objects.filter(papers=True))
         return [{
             'label': 'Donesené doklady',
