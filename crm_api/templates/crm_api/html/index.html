@@ -126,11 +126,11 @@
                         <span class="fa fa-times">Nepodáno</span>
                     {% endif %}
                 </a>
-                {% endif %}
-                {% if customer.vat == 'mesicne' %}
-                    za {% last_month True %}
-                {% elif customer.vat == 'ctvrtletne' %}
-                    za {% get_quartal %}. Q
+                    {% if customer.vat == 'mesicne' %}
+                        k {% get_vat_deadline True %}
+                    {% else %}
+                        k {% get_vat_deadline False %}
+                    {% endif %}
                 {% else %}
                     Není plátce DPH
                 {% endif %}
