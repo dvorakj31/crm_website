@@ -26,12 +26,28 @@ def get_quartal():
     return str(math.ceil(datetime.datetime.now().month / 3))
 
 
+def _get_deadline_day(month):
+    day = 25
+    now = datetime.datetime.now()
+    year = now.year
+    if month < now.month:
+        month = 1
+        year += 1
+    if month == 12:
+        day = 27
+    date = datetime.date(year, month, day)
+    if date.weekday() > 4:
+        day = day + 7 - date.weekday()
+    return day
+
+
 @register.simple_tag
 def get_vat_deadline(is_monthly):
     now = datetime.datetime.now()
-    date = "25. "
     if is_monthly:
-        date += f'{now.month if now.day <= 25 else ((now.month + 1) % 13) + 1}.'
+        month = now.month + 1
+        if month > 12:
+            month %= 12
     else:
         month = 1
         if 1 <= now.month <= 4:
@@ -42,5 +58,6 @@ def get_vat_deadline(is_monthly):
             month = 10
         if now.day > 25 and month == now.month:
             month = (month + 3) % 12
-        date += (str(month) + '.')
+    day = _get_deadline_day(month)
+    date = f"{day}. {month}."
     return date

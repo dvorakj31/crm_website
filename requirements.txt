@@ -1,3 +1,6 @@
 django<3.0
 django-bootstrap4
 django-jchart
+django-filter
+django-tempus-dominus
+django-cron

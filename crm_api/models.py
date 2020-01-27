@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
+
+import datetime
 import os
 # Create your models here.
 
@@ -103,6 +105,11 @@ class CustomerFiles(models.Model):
         return self.files.name
 
 
+class CustomerHistory(models.Model):
+    date = models.DateField(auto_now_add=True)
+    customer = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
+
+
 class WarningEmail(models.Model):
     MAIL_TYPES = [
         ('lvl1', 'První varování'),
@@ -118,7 +125,7 @@ class WarningEmail(models.Model):
     subject = models.CharField(max_length=20, verbose_name='Předmět')
     body = models.TextField(max_length=500, verbose_name='Tělo')
     mail_type = models.CharField(max_length=20, choices=MAIL_TYPES, default='lvl1', verbose_name='Druh varování')
-    send_date = models.IntegerField(choices=DATE_NUMBERS, default=1, verbose_name='Číslo dne odeslání')
+    send_date = models.IntegerField(choices=DATE_NUMBERS, verbose_name='Číslo dne odeslání', unique=True)
 
     def __str__(self):
         return self.name

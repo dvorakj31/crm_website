@@ -1,0 +1,140 @@
+{% extends 'crm_api/html/_table_pagination.html' %}
+{% load bootstrap4 %}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+{% load date_extras %}
+{% block head %}
+    {{ form.media }}
+{% endblock %}
+{% block body_extra %}
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <form id="id_date_form" method="get">
+            {{ form.as_p }}
+          </form>
+        </div>
+      </div>
+    </div>
+<script type="text/javascript">
+    $(function () {
+        $("#id_date_field").on("change.datetimepicker", function (e) {
+            $("#id_date_form").submit();
+        });
+    });
+</script>
+{% endblock %}
+{% block table_head %}
+<thead>
+    <tr>
+    <th>
+        Název subjektu
+    </th>
+    <th>
+        Mzdové podklady
+    </th>
+    <th>
+        Mzdy
+    </th>
+    <th>
+        Vyúčtování zálohové daně
+    </th>
+    <th>
+        Vyúčtování srážkové daně
+    </th>
+    <th>
+        Přinesl doklady DPH
+    </th>
+    <th>
+        Přiznání DPH podáno
+    </th>
+    <th>
+        Přiznání silniční daně podáno
+    </th>
+</tr>
+</thead>
+{% endblock %}
+{% block table_body %}
+<tbody>
+    {% for customer in object_list %}
+        <tr>
+            <td>
+                {{ customer.name }}
+            </td>
+            <td>
+                {% if customer.is_employer %}
+                    {% if customer.wage %}
+                        <span class="fa fa-check">Přinesl</span>
+                    {% else %}
+                        <span class="fa fa-times">Nepřinesl</span>
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if customer.is_employer %}
+                    {% if customer.submitted_wage_tax %}
+                        <span class="fa fa-check">Zpracované</span>
+                    {% else %}
+                        <span class="fa fa-times">Nezpracované</span>
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if customer.is_employer %}
+                    {% if customer.advance_tax %}
+                        <span class="fa fa-check">Zpracované</span>
+                    {% else %}
+                        <span class="fa fa-times">Nezpracované</span>
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if customer.is_employer %}
+                    {% if customer.withholding_tax %}
+                        <span class="fa fa-check">Zpracované</span>
+                    {% else %}
+                        <span class="fa fa-times">Nezpracované</span>
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if customer.vat == "mesicne" or customer.vat == "ctvrtletne" %}
+                    {% if customer.papers %}
+                        <span class="fa fa-check">Přinesl</span>
+                    {% else %}
+                        <span class="fa fa-times">Nepřinesl</span>
+                    {% endif %}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if customer.vat != 'neplatce' %}
+                    {% if customer.submitted_tax %}
+                        <span class="fa fa-check">Podáno</span>
+                    {% else %}
+                        <span class="fa fa-times">Nepodáno</span>
+                    {% endif %}
+                {% else %}
+                    Není plátce DPH
+                {% endif %}
+            </td>
+            <td>
+                {% if customer.road_tax %}
+                    {% if customer.submitted_road_tax %}
+                        <span class="fa fa-check">Podáno</span>
+                    {% else %}
+                        <span class="fa fa-times">Nepodáno</span>
+                    {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+{% endblock %}

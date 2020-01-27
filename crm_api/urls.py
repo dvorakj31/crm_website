@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from django_filters.views import FilterView
 from . import views
 from . import filters
-from crm_api.models import Customer
+from crm_api.models import Customer, CustomerHistory
 
 
 app_name = 'crm_api'
@@ -34,4 +34,5 @@ urlpatterns = [
     path('delete_email/<int:pk>/', views.WarningEmailDelete.as_view(), name='delete_email'),
     path('login/', auth_views.LoginView.as_view(template_name='crm_api/html/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('archive/', views.CustomerHistoryView.as_view(), name='archive'),
 ]

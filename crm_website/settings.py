@@ -43,9 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap4',
+    'tempus_dominus',
     'jchart',
     'django_filters',
     'crm_api.templatetags.date_extras',
+    'django_cron',
 ]
 
 MIDDLEWARE = [
@@ -57,6 +59,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CRON_CLASSES = [
+    "crm_api.tasks.SendMails",
+]
+
 
 ROOT_URLCONF = 'crm_website.urls'
 
@@ -142,9 +149,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # EMAIL CONFIG
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_USE_TLS = True
-EMAIL_HOST = 'localhost'
-EMAIL_HOST_USER = 'abcd@localhost'
-# EMAIL_HOST_PASSWORD = 'password'
-EMAIL_PORT = 1025
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST = 'local@host'
+EMAIL_HOST_USER = 'user@localhost'
+EMAIL_HOST_PASSWORD = 'secret_password'
+EMAIL_PORT = 587

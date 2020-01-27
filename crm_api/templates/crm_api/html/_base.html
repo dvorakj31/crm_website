@@ -43,7 +43,12 @@
                     {% endif %}
                   </div>
                 </div>
-            <form class="form-inline mt-2 mt-md-0" action="{% url 'crm_api:customer_search_result' %}" id="searchform" method="get" accept-charset="utf-8">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'crm_api:archive' %}">
+                        <i class="fa fa-history fa-fw" aria-hidden="true"></i>Historie
+                    </a>
+                </li>
+                <form class="form-inline mt-2 mt-md-0" action="{% url 'crm_api:customer_search_result' %}" id="searchform" method="get" accept-charset="utf-8">
                 <div class="form-group">
                     <input class="form-control mr-sm-2" id="searchbox" name="name" type="search" placeholder='Vyhledat klienta' required>
                 </div>

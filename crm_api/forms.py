@@ -1,5 +1,8 @@
 from django import forms
-from .models import Customer, WarningEmail, CustomerFiles
+from .models import Customer, WarningEmail, CustomerFiles, CustomerHistory
+from tempus_dominus.widgets import DatePicker
+
+import datetime
 
 
 class CustomerForm(forms.ModelForm):
@@ -38,3 +41,10 @@ class WarningEmailForm(forms.ModelForm):
             'body': 'Tělo',
             'email_type': 'Druh varování',
         }
+
+
+class ArchiveForm(forms.Form):
+
+    date_field = forms.DateField(label="",
+                                 widget=DatePicker(attrs={'append': 'fa fa-calendar', 'icon_toggle': True}),
+                                 initial=datetime.date.today().isoformat())

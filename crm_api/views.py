@@ -8,11 +8,12 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django import forms
-from .models import Customer, WarningEmail, CustomerFiles
+from .models import Customer, WarningEmail, CustomerFiles, CustomerHistory
 from .charts import TaxSubPieChart, PapersPieChart
 from django.conf import settings
 from wsgiref.util import FileWrapper
 from .filters import CustomerFilter
+from.forms import ArchiveForm
 
 import os
 import sys
@@ -198,7 +199,6 @@ def create_folder(request, cust_id):
 
 @login_required(login_url=reverse_lazy('crm_api:login'))
 def delete_folder(request, path):
-    print(os.path.normpath(path))
     if not os.path.normpath(path).startswith('media/'):
         return redirect(request.META.get['HTTP_REFERER'])
     shutil.rmtree(path)
@@ -224,6 +224,37 @@ class CustomerList(LoginRequiredMixin, generic.ListView):
         query_set = super().get_queryset()
         if self.request.GET:
             query_set = CustomerFilter(self.request.GET, queryset=Customer.objects.all()).qs
+        return query_set
+
+
+# Archive view
+class CustomerHistoryView(LoginRequiredMixin, generic.ListView):
+    model = CustomerHistory
+    fields = ['date']
+    template_name = 'crm_api/html/archive.html'
+    login_url = '/login/'
+    paginate_by = PAGE_NUM
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = ArchiveForm()
+        date = self.request.GET.get("date_field", None)
+        if date is not None:
+            form.initial['date_field'] = date
+        context['form'] = form
+        return context
+
+    def get_queryset(self):
+        query_set = CustomerHistory.objects.none()
+        if self.request.GET:
+            if self.request.GET.get("date_field", None) is None:
+                return query_set
+            try:
+                query_date = datetime.date.fromisoformat(self.request.GET.get("date_field"))
+            except:
+                return query_set
+            print(f'query_date = {query_date}')
+            query_set = CustomerHistory.objects.filter(date__month=query_date.month, date__year=query_date.year)
         return query_set
 
 
@@ -274,7 +305,6 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
         try:
             cust_dir = _get_cust_dir(self.kwargs['cust_id'], self.request)
             file_list = []
-            print(f'custdir: {cust_dir}')
             for x in os.listdir(cust_dir):
                 file_path = os.path.join(cust_dir, x)
                 try:
@@ -284,15 +314,12 @@ class CustomerFilesList(LoginRequiredMixin, generic.CreateView, generic.ListView
                 file_list.append(CFile(os.path.join(cust_dir, x), f_id))
             return file_list
         except:
-            print(file_list)
-            print(sys.exc_info()[0])
-            return []        
+            return []
 
     def form_valid(self, form):
         try:
             form.instance.customer = Customer.objects.get(pk=self.kwargs['cust_id'])
             form.instance.file_path = _file_path(self.kwargs['cust_id'], self.request, str(form.instance))
-            print(str(form.instance.file_path))
         except Customer.DoesNotExist:
             messages.error(self.request, 'Neplatný subjekt')
             return redirect(self.request.get_full_path())
@@ -322,7 +349,6 @@ class CustomerFilesDelete(PermissionRequiredMixin, LoginRequiredMixin, generic.D
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
-        print('trying to delete', str(obj.file_path))
         try:
             os.remove(os.path.join(str(obj.file_path)))
         except OSError:
