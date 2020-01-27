@@ -52,8 +52,8 @@ class RestartDatabase(CronJobBase):
     def do(self):
         today = datetime.date.today()
         print(f'today = {today}')
-        # if today.day not in [1, 2, 3] or today.weekday() > 4:
-        #     return
+        if today.day not in [1, 2, 3] or today.weekday() > 4:
+            return
         try:
             self._create_customer_history()
         except Exception as e:
