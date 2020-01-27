@@ -59,11 +59,11 @@
     {% for customer in object_list %}
         <tr>
             <td>
-                {{ customer.name }}
+                {{ customer.customer.name }}
             </td>
             <td>
-                {% if customer.is_employer %}
-                    {% if customer.wage %}
+                {% if customer.customer.is_employer %}
+                    {% if customer.customer.wage %}
                         <span class="fa fa-check">Přinesl</span>
                     {% else %}
                         <span class="fa fa-times">Nepřinesl</span>
@@ -71,8 +71,8 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.is_employer %}
-                    {% if customer.submitted_wage_tax %}
+                {% if customer.customer.is_employer %}
+                    {% if customer.customer.submitted_wage_tax %}
                         <span class="fa fa-check">Zpracované</span>
                     {% else %}
                         <span class="fa fa-times">Nezpracované</span>
@@ -82,8 +82,8 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.is_employer %}
-                    {% if customer.advance_tax %}
+                {% if customer.customer.is_employer %}
+                    {% if customer.customer.advance_tax %}
                         <span class="fa fa-check">Zpracované</span>
                     {% else %}
                         <span class="fa fa-times">Nezpracované</span>
@@ -93,8 +93,8 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.is_employer %}
-                    {% if customer.withholding_tax %}
+                {% if customer.customer.is_employer %}
+                    {% if customer.customer.withholding_tax %}
                         <span class="fa fa-check">Zpracované</span>
                     {% else %}
                         <span class="fa fa-times">Nezpracované</span>
@@ -104,8 +104,8 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.vat == "mesicne" or customer.vat == "ctvrtletne" %}
-                    {% if customer.papers %}
+                {% if customer.customer.vat == "mesicne" or customer.customer.vat == "ctvrtletne" %}
+                    {% if customer.customer.papers %}
                         <span class="fa fa-check">Přinesl</span>
                     {% else %}
                         <span class="fa fa-times">Nepřinesl</span>
@@ -115,8 +115,8 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.vat != 'neplatce' %}
-                    {% if customer.submitted_tax %}
+                {% if customer.customer.vat != 'neplatce' %}
+                    {% if customer.customer.submitted_tax %}
                         <span class="fa fa-check">Podáno</span>
                     {% else %}
                         <span class="fa fa-times">Nepodáno</span>
@@ -126,12 +126,14 @@
                 {% endif %}
             </td>
             <td>
-                {% if customer.road_tax %}
-                    {% if customer.submitted_road_tax %}
+                {% if customer.customer.road_tax %}
+                    {% if customer.customer.submitted_road_tax %}
                         <span class="fa fa-check">Podáno</span>
                     {% else %}
                         <span class="fa fa-times">Nepodáno</span>
                     {% endif %}
+                {% else %}
+                    -
                 {% endif %}
             </td>
         </tr>

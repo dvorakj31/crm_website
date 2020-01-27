@@ -1,6 +1,6 @@
 {% extends 'crm_api/html/create_subject.html' %}
 {% load bootstrap4 %}
-{% load staticfiles %}
+{% load static %}
 <script src="{% static 'customer_table.js' %}"></script>
 {% block content %}
     <form method="POST" action="{% url "crm_api:delete_customer" pk=customer.id %}">

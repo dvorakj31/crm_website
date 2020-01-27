@@ -3,7 +3,6 @@ from django.core.validators import RegexValidator
 
 import datetime
 import os
-# Create your models here.
 
 
 class Customer(models.Model):    
@@ -90,6 +89,27 @@ class Customer(models.Model):
         return self.name
 
 
+# FIND OUT HOW TO INHERIT AND SAVE IN ANOTHER DB_TABLE
+class CustomerClone(models.Model):
+    name = models.CharField(max_length=100,
+                            validators=[RegexValidator(r'^\w(\w|\s|\.|,)*$',
+                                                       'Povoleny jsou pouze znaky a-ž A-Ž 0-9 . , a mezera')])
+    submitted_tax = models.BooleanField(default=False)
+    submitted_road_tax = models.BooleanField(default=False)
+    submitted_wage_tax = models.BooleanField(default=False)
+    vat = models.CharField(max_length=20, default='neplatce')
+    papers = models.BooleanField(null=True, blank=True)
+    wage = models.BooleanField(default=False)
+    advance_tax = models.BooleanField(default=False)
+    withholding_tax = models.BooleanField(default=False)
+    property_tax = models.BooleanField(default=False)
+    road_tax = models.BooleanField(default=False)
+    is_employer = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+
 class CustomerFiles(models.Model):
     files = models.FileField()
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='files')
@@ -107,24 +127,17 @@ class CustomerFiles(models.Model):
 
 class CustomerHistory(models.Model):
     date = models.DateField(auto_now_add=True)
-    customer = models.ForeignKey(to=Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(to=CustomerClone, on_delete=models.CASCADE)
 
 
 class WarningEmail(models.Model):
-    MAIL_TYPES = [
-        ('lvl1', 'První varování'),
-        ('lvl2', 'Druhé varování'),
-        ('lvl3', 'Třetí varování'),
-    ]
-
     DATE_NUMBERS = [
         (x, y) for x, y in zip([x for x in range(1, 29)], [str(y) for y in range(1, 29)])
     ]
 
-    name = models.CharField(max_length=20, verbose_name='Název')
-    subject = models.CharField(max_length=20, verbose_name='Předmět')
-    body = models.TextField(max_length=500, verbose_name='Tělo')
-    mail_type = models.CharField(max_length=20, choices=MAIL_TYPES, default='lvl1', verbose_name='Druh varování')
+    name = models.CharField(max_length=20, verbose_name='Název (interní)')
+    subject = models.CharField(max_length=20, verbose_name='Předmět emailu')
+    body = models.TextField(max_length=500, verbose_name='Tělo emailu')
     send_date = models.IntegerField(choices=DATE_NUMBERS, verbose_name='Číslo dne odeslání', unique=True)
 
     def __str__(self):

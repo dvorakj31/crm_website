@@ -62,6 +62,7 @@ MIDDLEWARE = [
 
 CRON_CLASSES = [
     "crm_api.tasks.SendMails",
+    "crm_api.tasks.RestartDatabase",
 ]
 
 

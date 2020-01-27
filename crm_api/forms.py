@@ -37,9 +37,8 @@ class WarningEmailForm(forms.ModelForm):
         exclude = ()
         label = {
             'name': 'Název',
-            'subject': 'Předmět',
-            'body': 'Tělo',
-            'email_type': 'Druh varování',
+            'subject': 'Předmět emailu',
+            'body': 'Tělo emailu',
         }
 
 

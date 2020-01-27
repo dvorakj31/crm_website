@@ -253,7 +253,6 @@ class CustomerHistoryView(LoginRequiredMixin, generic.ListView):
                 query_date = datetime.date.fromisoformat(self.request.GET.get("date_field"))
             except:
                 return query_set
-            print(f'query_date = {query_date}')
             query_set = CustomerHistory.objects.filter(date__month=query_date.month, date__year=query_date.year)
         return query_set
 
