@@ -44,11 +44,7 @@ def _get_deadline_day(month):
 @register.simple_tag
 def get_vat_deadline(is_monthly):
     now = datetime.datetime.now()
-    if is_monthly:
-        month = now.month + 1
-        if month > 12:
-            month %= 12
-    else:
+    if not is_monthly:
         month = 1
         if 1 <= now.month <= 4:
             month = 4
@@ -56,8 +52,8 @@ def get_vat_deadline(is_monthly):
             month = 7
         elif 8 <= now.month <= 10:
             month = 10
-        if now.day > 25 and month == now.month:
-            month = (month + 3) % 12
+    else:
+        month = now.month
     day = _get_deadline_day(month)
     date = f"{day}. {month}."
     return date

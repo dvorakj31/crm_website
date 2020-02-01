@@ -56,7 +56,7 @@
                         <span class="fa fa-times">Nepřinesl</span>
                     {% endif %}
                     </a>
-                    k {% last_month True %}
+                    za {% last_month True %}
                     {% else %}
                         -
                 {% endif %}
@@ -70,7 +70,7 @@
                     <span class="fa fa-times">Nezpracované</span>
                 {% endif %}
                 </a>
-                 k {% last_month True %}
+                 za {% last_month True %}
                 {% else %}
                     -
                 {% endif %}
@@ -145,7 +145,7 @@
                         <span class="fa fa-times">Nepodáno</span>
                     {% endif %}
                     </a>
-                     k {% last_year %}
+                     za rok {% last_year %}
                 {% else %}
                     -
                 {% endif %}
@@ -157,12 +157,16 @@
 {% block extra_content %}
 {% if tax_pie_char or papers_pie_chart %}
 <table style="width: 100%">
-    <td>
-        {{ tax_pie_chart.as_html }}
-    </td>
-    <td>
-        {{ papers_pie_chart.as_html }}
-    </td>
+    <tbody>
+        <tr>
+            <td>
+                {{ tax_pie_chart.as_html }}
+            </td>
+            <td>
+                {{ papers_pie_chart.as_html }}
+            </td>
+        </tr>
+    </tbody>
 </table>
 {% endif %}
 {% endblock %}
